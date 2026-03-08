@@ -1,0 +1,1705 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>משחק הכדורגל של שחר!</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+        }
+
+        .game-container {
+            text-align: center;
+        }
+
+        h1 {
+            color: white;
+            font-size: 2.5rem;
+            text-shadow: 3px 3px 0 #ff6b6b, -3px -3px 0 #4ecdc4;
+            margin-bottom: 10px;
+            animation: bounce 1s ease infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .score-board {
+            background: #fff;
+            padding: 10px 30px;
+            border-radius: 20px;
+            font-size: 1.5rem;
+            color: #333;
+            margin-bottom: 15px;
+            display: inline-block;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .score {
+            color: #22c55e;
+            font-weight: bold;
+            font-size: 2rem;
+        }
+
+        .missed {
+            color: #ff6b6b;
+            font-weight: bold;
+            font-size: 2rem;
+        }
+
+        .bonus {
+            color: #fbbf24;
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+
+        #gameCanvas {
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .instructions {
+            color: white;
+            margin-top: 15px;
+            font-size: 1.3rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .keys {
+            display: inline-block;
+            background: rgba(255,255,255,0.2);
+            padding: 5px 15px;
+            border-radius: 10px;
+            margin: 5px;
+        }
+
+        .message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 4rem;
+            text-shadow: 4px 4px 0 #333;
+            animation: celebrate 0.5s ease;
+            display: none;
+            z-index: 100;
+        }
+
+        .message.save {
+            color: #4ade80;
+        }
+
+        .message.miss {
+            color: #ff6b6b;
+        }
+
+        @keyframes celebrate {
+            0% { transform: translate(-50%, -50%) scale(0); }
+            50% { transform: translate(-50%, -50%) scale(1.3); }
+            100% { transform: translate(-50%, -50%) scale(1); }
+        }
+
+        .restart-btn {
+            margin-top: 15px;
+            padding: 15px 40px;
+            font-size: 1.3rem;
+            background: linear-gradient(45deg, #ff6b6b, #feca57);
+            border: none;
+            border-radius: 30px;
+            color: white;
+            cursor: pointer;
+            font-family: Arial, sans-serif;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            transition: transform 0.2s;
+        }
+
+        .restart-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .game-over {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 200;
+        }
+
+        .game-over h2 {
+            color: #ffd700;
+            font-size: 3rem;
+            margin-bottom: 20px;
+            text-shadow: 3px 3px 0 #ff6b6b;
+        }
+
+        .game-over p {
+            color: white;
+            font-size: 1.5rem;
+            margin-bottom: 30px;
+        }
+
+        /* Quiz Popup (shared styles) */
+        .quiz-popup {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.85);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 300;
+        }
+
+        .quiz-content {
+            background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+            padding: 40px 60px;
+            border-radius: 30px;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            border: 5px solid #fbbf24;
+        }
+
+        .quiz-content h2 {
+            color: #fbbf24;
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .quiz-content .subtitle {
+            color: white;
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+        }
+
+        /* Math Quiz */
+        .math-question {
+            color: white;
+            font-size: 4rem;
+            margin-bottom: 30px;
+            text-shadow: 3px 3px 0 #1e3a8a;
+            direction: ltr;
+            unicode-bidi: bidi-override;
+        }
+
+        .math-input {
+            font-size: 3rem;
+            width: 150px;
+            padding: 15px;
+            text-align: center;
+            border: 4px solid #fbbf24;
+            border-radius: 15px;
+            outline: none;
+            margin-bottom: 20px;
+        }
+
+        .math-input:focus {
+            border-color: #22c55e;
+            box-shadow: 0 0 20px rgba(34, 197, 94, 0.5);
+        }
+
+        .quiz-submit {
+            display: block;
+            margin: 20px auto 0;
+            padding: 15px 50px;
+            font-size: 1.5rem;
+            background: linear-gradient(45deg, #22c55e, #4ade80);
+            border: none;
+            border-radius: 25px;
+            color: white;
+            cursor: pointer;
+            font-family: Arial, sans-serif;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            transition: transform 0.2s;
+        }
+
+        .quiz-submit:hover {
+            transform: scale(1.1);
+        }
+
+        .quiz-result {
+            color: white;
+            font-size: 2rem;
+            margin-top: 20px;
+            min-height: 50px;
+        }
+
+        .quiz-result.correct {
+            color: #4ade80;
+        }
+
+        .quiz-result.wrong {
+            color: #ff6b6b;
+        }
+
+        /* Reading Quiz */
+        .reading-picture {
+            font-size: 120px;
+            margin-bottom: 20px;
+            filter: drop-shadow(4px 4px 4px rgba(0,0,0,0.3));
+        }
+
+        .reading-options {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .reading-option {
+            padding: 20px 40px;
+            font-size: 2rem;
+            background: linear-gradient(45deg, #8b5cf6, #a78bfa);
+            border: 4px solid transparent;
+            border-radius: 20px;
+            color: white;
+            cursor: pointer;
+            font-family: Arial, sans-serif;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            transition: all 0.2s;
+        }
+
+        .reading-option:hover {
+            transform: scale(1.1);
+            border-color: #fbbf24;
+        }
+
+        .reading-option.selected {
+            background: linear-gradient(45deg, #22c55e, #4ade80);
+            border-color: white;
+        }
+
+        .reading-option.wrong-selected {
+            background: linear-gradient(45deg, #ef4444, #f87171);
+            border-color: white;
+        }
+
+        .bonus-message {
+            position: fixed;
+            top: 30%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 3rem;
+            color: #fbbf24;
+            text-shadow: 3px 3px 0 #333;
+            display: none;
+            z-index: 100;
+            animation: bonusPop 1s ease;
+        }
+
+        @keyframes bonusPop {
+            0% { transform: translate(-50%, -50%) scale(0); opacity: 1; }
+            50% { transform: translate(-50%, -50%) scale(1.3); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(1) translateY(-50px); opacity: 0; }
+        }
+
+        /* Fan shouts */
+        .fan-shout {
+            position: fixed;
+            font-size: 2rem;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            pointer-events: none;
+            z-index: 50;
+            animation: shoutAnim 1.5s ease forwards;
+        }
+
+        @keyframes shoutAnim {
+            0% { transform: scale(0) rotate(-10deg); opacity: 0; }
+            20% { transform: scale(1.2) rotate(5deg); opacity: 1; }
+            40% { transform: scale(1) rotate(-3deg); opacity: 1; }
+            100% { transform: scale(0.8) translateY(-30px) rotate(0deg); opacity: 0; }
+        }
+
+        .fan-shout.cheer {
+            color: #4ade80;
+        }
+
+        .fan-shout.boo {
+            color: #ff6b6b;
+        }
+
+        /* Difficulty selection */
+        .difficulty-options {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .difficulty-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 25px 35px;
+            border: 4px solid transparent;
+            border-radius: 20px;
+            cursor: pointer;
+            font-family: Arial, sans-serif;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+            transition: all 0.2s;
+        }
+
+        .difficulty-btn:hover {
+            transform: scale(1.08);
+            border-color: #fbbf24;
+        }
+
+        .difficulty-btn.easy {
+            background: linear-gradient(45deg, #22c55e, #4ade80);
+        }
+
+        .difficulty-btn.hard {
+            background: linear-gradient(45deg, #f59e0b, #fbbf24);
+        }
+
+        .diff-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .diff-title {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: white;
+            margin-bottom: 8px;
+        }
+
+        .diff-desc {
+            font-size: 1.1rem;
+            color: rgba(255,255,255,0.9);
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>שחר השוער!</h1>
+        <div class="score-board">
+            הצלות: <span class="score" id="saves">0</span>
+            &nbsp;&nbsp;|&nbsp;&nbsp;
+            החמצות: <span class="missed" id="missed">0</span>
+            &nbsp;&nbsp;|&nbsp;&nbsp;
+            בונוס: <span class="bonus" id="bonus">0</span>
+            &nbsp;&nbsp;|&nbsp;&nbsp;
+            נותרו: <span id="remaining">30</span>
+        </div>
+        <br>
+        <canvas id="gameCanvas" width="700" height="500"></canvas>
+        <p class="instructions">
+            <span class="keys">למעלה</span> ו <span class="keys">למטה</span>
+            להזיז את קורטואה ולעצור את הכדור של הולנד!
+        </p>
+        <button class="restart-btn" onclick="resetGame()">משחק חדש</button>
+    </div>
+    <div class="message save" id="saveMessage">הצלה!</div>
+    <div class="message miss" id="missMessage">גול...</div>
+    <div class="bonus-message" id="bonusMessage">+5 נקודות!</div>
+
+    <div class="game-over" id="gameOver">
+        <h2>המשחק נגמר!</h2>
+        <p id="finalScore"></p>
+        <button class="restart-btn" onclick="resetGame()">שחק שוב!</button>
+    </div>
+
+    <!-- Start Screen -->
+    <div class="quiz-popup" id="startScreen" style="display: flex;">
+        <div class="quiz-content">
+            <h2>שחר השוער!</h2>
+            <p class="subtitle">בחר רמת קושי לתרגילי חשבון:</p>
+            <div class="difficulty-options">
+                <button class="difficulty-btn easy" onclick="startWithDifficulty('easy')">
+                    <span class="diff-icon">⭐</span>
+                    <span class="diff-title">קל</span>
+                    <span class="diff-desc">חיבור עד 10</span>
+                </button>
+                <button class="difficulty-btn hard" onclick="startWithDifficulty('hard')">
+                    <span class="diff-icon">⭐⭐</span>
+                    <span class="diff-title">מאתגר</span>
+                    <span class="diff-desc">חיבור וחיסור עד 20</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Math Quiz Popup -->
+    <div class="quiz-popup" id="mathQuiz">
+        <div class="quiz-content">
+            <h2>זמן לתרגיל חשבון!</h2>
+            <p class="subtitle">ענה נכון וקבל 5 נקודות בונוס!</p>
+            <div class="math-question" id="mathQuestion">5 + 8 = ?</div>
+            <input type="number" class="math-input" id="mathInput" min="0" max="40" autofocus>
+            <button class="quiz-submit" onclick="checkMathAnswer()">בדוק!</button>
+            <div class="quiz-result" id="mathResult"></div>
+        </div>
+    </div>
+
+    <!-- Reading Quiz Popup -->
+    <div class="quiz-popup" id="readingQuiz">
+        <div class="quiz-content">
+            <h2>מה רואים בתמונה?</h2>
+            <p class="subtitle">בחר את המילה הנכונה וקבל 5 נקודות בונוס!</p>
+            <div class="reading-picture" id="readingPicture">☁️</div>
+            <div class="reading-options" id="readingOptions">
+                <button class="reading-option" onclick="checkReadingAnswer(0)">ענן</button>
+                <button class="reading-option" onclick="checkReadingAnswer(1)">ירח</button>
+                <button class="reading-option" onclick="checkReadingAnswer(2)">שמש</button>
+            </div>
+            <div class="quiz-result" id="readingResult"></div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const saveMessage = document.getElementById('saveMessage');
+        const missMessage = document.getElementById('missMessage');
+        const bonusMessage = document.getElementById('bonusMessage');
+        const savesElement = document.getElementById('saves');
+        const missedElement = document.getElementById('missed');
+        const bonusElement = document.getElementById('bonus');
+        const gameOverScreen = document.getElementById('gameOver');
+        const finalScoreElement = document.getElementById('finalScore');
+        const mathQuiz = document.getElementById('mathQuiz');
+        const mathQuestion = document.getElementById('mathQuestion');
+        const mathInput = document.getElementById('mathInput');
+        const mathResult = document.getElementById('mathResult');
+        const readingQuiz = document.getElementById('readingQuiz');
+        const readingPicture = document.getElementById('readingPicture');
+        const readingOptions = document.getElementById('readingOptions');
+        const readingResult = document.getElementById('readingResult');
+
+        let saves = 0;
+        let missed = 0;
+        let bonusPoints = 0;
+        let totalBalls = 0;
+        const maxBalls = 30;
+        let gameRunning = false; // Start as false until difficulty is chosen
+        let mathAnswer = 0;
+        let quizShownForRound = false;
+        let currentReadingAnswer = 0;
+        let mathDifficulty = 'easy'; // 'easy' = addition up to 10, 'hard' = add/subtract up to 20
+        const remainingElement = document.getElementById('remaining');
+        const startScreen = document.getElementById('startScreen');
+
+        // Start game with selected difficulty
+        function startWithDifficulty(difficulty) {
+            mathDifficulty = difficulty;
+            startScreen.style.display = 'none';
+            initAudio();
+            playWhistleSound();
+            gameRunning = true;
+            setTimeout(shootBall, 1000);
+        }
+
+        // === SOUND EFFECTS ===
+        let audioContext = null;
+
+        function initAudio() {
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioContext.state === 'suspended') {
+                audioContext.resume();
+            }
+        }
+
+        // Initialize audio on first interaction
+        document.addEventListener('click', initAudio, { once: true });
+        document.addEventListener('keydown', initAudio, { once: true });
+
+        function playKickSound() {
+            if (!audioContext) return;
+            const osc = audioContext.createOscillator();
+            const gain = audioContext.createGain();
+            osc.connect(gain);
+            gain.connect(audioContext.destination);
+
+            osc.frequency.setValueAtTime(200, audioContext.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(80, audioContext.currentTime + 0.1);
+            gain.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.15);
+
+            osc.start(audioContext.currentTime);
+            osc.stop(audioContext.currentTime + 0.15);
+        }
+
+        function playSaveSound() {
+            if (!audioContext) return;
+            // Happy ascending notes
+            const notes = [523, 659, 784]; // C5, E5, G5
+            notes.forEach((freq, i) => {
+                const osc = audioContext.createOscillator();
+                const gain = audioContext.createGain();
+                osc.type = 'square';
+                osc.connect(gain);
+                gain.connect(audioContext.destination);
+
+                osc.frequency.setValueAtTime(freq, audioContext.currentTime + i * 0.1);
+                gain.gain.setValueAtTime(0.15, audioContext.currentTime + i * 0.1);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + i * 0.1 + 0.2);
+
+                osc.start(audioContext.currentTime + i * 0.1);
+                osc.stop(audioContext.currentTime + i * 0.1 + 0.2);
+            });
+
+            // Crowd cheer
+            playCheerSound();
+        }
+
+        function playGoalSound() {
+            if (!audioContext) return;
+            // Sad descending notes
+            const notes = [400, 300, 200];
+            notes.forEach((freq, i) => {
+                const osc = audioContext.createOscillator();
+                const gain = audioContext.createGain();
+                osc.type = 'sawtooth';
+                osc.connect(gain);
+                gain.connect(audioContext.destination);
+
+                osc.frequency.setValueAtTime(freq, audioContext.currentTime + i * 0.15);
+                gain.gain.setValueAtTime(0.1, audioContext.currentTime + i * 0.15);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + i * 0.15 + 0.3);
+
+                osc.start(audioContext.currentTime + i * 0.15);
+                osc.stop(audioContext.currentTime + i * 0.15 + 0.3);
+            });
+
+            // Disappointed crowd
+            playBooSound();
+        }
+
+        function playCheerSound() {
+            if (!audioContext) return;
+            // White noise burst for crowd cheer
+            const bufferSize = audioContext.sampleRate * 0.5;
+            const buffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
+            const data = buffer.getChannelData(0);
+            for (let i = 0; i < bufferSize; i++) {
+                data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / bufferSize, 2);
+            }
+
+            const noise = audioContext.createBufferSource();
+            noise.buffer = buffer;
+
+            const filter = audioContext.createBiquadFilter();
+            filter.type = 'bandpass';
+            filter.frequency.value = 1000;
+            filter.Q.value = 0.5;
+
+            const gain = audioContext.createGain();
+            gain.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+
+            noise.connect(filter);
+            filter.connect(gain);
+            gain.connect(audioContext.destination);
+
+            noise.start();
+        }
+
+        function playBooSound() {
+            if (!audioContext) return;
+            // Low rumble for disappointed crowd
+            const osc = audioContext.createOscillator();
+            const gain = audioContext.createGain();
+            osc.type = 'sawtooth';
+            osc.connect(gain);
+            gain.connect(audioContext.destination);
+
+            osc.frequency.setValueAtTime(100, audioContext.currentTime);
+            osc.frequency.linearRampToValueAtTime(60, audioContext.currentTime + 0.5);
+            gain.gain.setValueAtTime(0.1, audioContext.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+
+            osc.start(audioContext.currentTime);
+            osc.stop(audioContext.currentTime + 0.5);
+        }
+
+        function playWhistleSound() {
+            if (!audioContext) return;
+            const osc = audioContext.createOscillator();
+            const gain = audioContext.createGain();
+            osc.type = 'sine';
+            osc.connect(gain);
+            gain.connect(audioContext.destination);
+
+            osc.frequency.setValueAtTime(800, audioContext.currentTime);
+            osc.frequency.setValueAtTime(1200, audioContext.currentTime + 0.1);
+            osc.frequency.setValueAtTime(800, audioContext.currentTime + 0.2);
+            gain.gain.setValueAtTime(0.2, audioContext.currentTime);
+            gain.gain.setValueAtTime(0.2, audioContext.currentTime + 0.25);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.4);
+
+            osc.start(audioContext.currentTime);
+            osc.stop(audioContext.currentTime + 0.4);
+        }
+
+        function playBonusSound() {
+            if (!audioContext) return;
+            // Magical success sound
+            const notes = [523, 659, 784, 1047]; // C5, E5, G5, C6
+            notes.forEach((freq, i) => {
+                const osc = audioContext.createOscillator();
+                const gain = audioContext.createGain();
+                osc.type = 'sine';
+                osc.connect(gain);
+                gain.connect(audioContext.destination);
+
+                osc.frequency.setValueAtTime(freq, audioContext.currentTime + i * 0.08);
+                gain.gain.setValueAtTime(0.15, audioContext.currentTime + i * 0.08);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + i * 0.08 + 0.3);
+
+                osc.start(audioContext.currentTime + i * 0.08);
+                osc.stop(audioContext.currentTime + i * 0.08 + 0.3);
+            });
+        }
+
+        function playGameOverSound() {
+            if (!audioContext) return;
+            // Fanfare
+            const notes = [392, 523, 659, 784, 659, 784, 1047];
+            const durations = [0.15, 0.15, 0.15, 0.3, 0.15, 0.15, 0.5];
+            let time = audioContext.currentTime;
+
+            notes.forEach((freq, i) => {
+                const osc = audioContext.createOscillator();
+                const gain = audioContext.createGain();
+                osc.type = 'square';
+                osc.connect(gain);
+                gain.connect(audioContext.destination);
+
+                osc.frequency.setValueAtTime(freq, time);
+                gain.gain.setValueAtTime(0.12, time);
+                gain.gain.exponentialRampToValueAtTime(0.01, time + durations[i]);
+
+                osc.start(time);
+                osc.stop(time + durations[i]);
+                time += durations[i];
+            });
+        }
+
+        // Fan cheers and boos
+        const cheerShouts = [
+            'יש!', 'כל הכבוד!', 'מלך!', 'הצלה!', 'וואו!', 'אלוף!',
+            'שחר!', 'גיבור!', 'עוד!', 'סבבה!', 'יופי!', 'מדהים!'
+        ];
+        const booShouts = [
+            'אוי לא...', 'חבל...', 'נו...', 'אוף...', 'עזוב...',
+            'פעם הבאה!', 'קדימה!', 'לא נורא!', 'יאללה!', 'נסה שוב!'
+        ];
+
+        // Fans data
+        const fans = [];
+        const fanColors = ['#ff6b6b', '#4ecdc4', '#ffd93d', '#6bcb77', '#9b59b6', '#3498db', '#e74c3c', '#1abc9c'];
+
+        // Initialize fans
+        function initFans() {
+            fans.length = 0;
+            // Row of fans
+            for (let i = 0; i < 14; i++) {
+                fans.push({
+                    x: 50 + i * 46,
+                    y: 20,
+                    color: fanColors[Math.floor(Math.random() * fanColors.length)],
+                    armUp: false,
+                    bounce: 0,
+                    team: Math.random() > 0.5 ? 'real' : 'city', // Real Madrid or Man City fan
+                    hasScarf: Math.random() > 0.6,
+                    scarfWave: Math.random() * Math.PI * 2
+                });
+            }
+        }
+        initFans();
+
+        // Reading quiz data: emoji, correct answer, and two wrong answers
+        const readingQuizzes = [
+            { picture: '☁️', correct: 'ענן', wrong: ['ירח', 'שמש'] },
+            { picture: '🌙', correct: 'ירח', wrong: ['כוכב', 'שמש'] },
+            { picture: '☀️', correct: 'שמש', wrong: ['ירח', 'ענן'] },
+            { picture: '⭐', correct: 'כוכב', wrong: ['ירח', 'שמש'] },
+            { picture: '🌈', correct: 'קשת', wrong: ['ענן', 'גשם'] },
+            { picture: '🌧️', correct: 'גשם', wrong: ['שלג', 'שמש'] },
+            { picture: '❄️', correct: 'שלג', wrong: ['גשם', 'ענן'] },
+            { picture: '🐶', correct: 'כלב', wrong: ['חתול', 'ארנב'] },
+            { picture: '🐱', correct: 'חתול', wrong: ['כלב', 'עכבר'] },
+            { picture: '🐰', correct: 'ארנב', wrong: ['כלב', 'חתול'] },
+            { picture: '🐘', correct: 'פיל', wrong: ['אריה', 'דוב'] },
+            { picture: '🦁', correct: 'אריה', wrong: ['נמר', 'דוב'] },
+            { picture: '🐻', correct: 'דוב', wrong: ['אריה', 'פיל'] },
+            { picture: '🐟', correct: 'דג', wrong: ['ציפור', 'פרפר'] },
+            { picture: '🦋', correct: 'פרפר', wrong: ['ציפור', 'דבורה'] },
+            { picture: '🐦', correct: 'ציפור', wrong: ['פרפר', 'דג'] },
+            { picture: '🍎', correct: 'תפוח', wrong: ['בננה', 'ענבים'] },
+            { picture: '🍌', correct: 'בננה', wrong: ['תפוח', 'תפוז'] },
+            { picture: '🍊', correct: 'תפוז', wrong: ['תפוח', 'לימון'] },
+            { picture: '🍇', correct: 'ענבים', wrong: ['תפוח', 'בננה'] },
+            { picture: '🍓', correct: 'תות', wrong: ['תפוח', 'ענבים'] },
+            { picture: '🚗', correct: 'מכונית', wrong: ['אוטובוס', 'רכבת'] },
+            { picture: '🚌', correct: 'אוטובוס', wrong: ['מכונית', 'משאית'] },
+            { picture: '🚂', correct: 'רכבת', wrong: ['מכונית', 'אוטובוס'] },
+            { picture: '✈️', correct: 'מטוס', wrong: ['רכבת', 'אונייה'] },
+            { picture: '🚢', correct: 'אונייה', wrong: ['מטוס', 'רכבת'] },
+            { picture: '🏠', correct: 'בית', wrong: ['עץ', 'פרח'] },
+            { picture: '🌳', correct: 'עץ', wrong: ['פרח', 'בית'] },
+            { picture: '🌸', correct: 'פרח', wrong: ['עץ', 'עלה'] },
+            { picture: '⚽', correct: 'כדור', wrong: ['כובע', 'נעל'] },
+        ];
+
+        let ball = {
+            x: 650,
+            y: 250,
+            radius: 22,
+            velocityX: 0,
+            velocityY: 0,
+            active: false
+        };
+
+        const goal = {
+            x: 30,
+            y: 100,
+            width: 30,
+            height: 300
+        };
+
+        const goalkeeper = {
+            x: 70,
+            y: 200,
+            width: 40,
+            height: 100,
+            speed: 8
+        };
+
+        const striker = {
+            x: 550,
+            y: 200,
+            width: 40,
+            height: 100
+        };
+
+        let keys = {
+            up: false,
+            down: false
+        };
+
+        // Keyboard controls
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') {
+                keys.up = true;
+                e.preventDefault();
+            }
+            if (e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') {
+                keys.down = true;
+                e.preventDefault();
+            }
+            // Enter key for math quiz
+            if (e.key === 'Enter' && mathQuiz.style.display === 'flex') {
+                checkMathAnswer();
+            }
+        });
+
+        document.addEventListener('keyup', (e) => {
+            if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') {
+                keys.up = false;
+            }
+            if (e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') {
+                keys.down = false;
+            }
+        });
+
+        // Draw fans in the stands
+        function drawFans() {
+            // Draw stadium stands background
+            ctx.fillStyle = '#4a4a6a';
+            ctx.fillRect(0, 0, canvas.width, 58);
+
+            // Stadium railing
+            ctx.fillStyle = '#666';
+            ctx.fillRect(0, 53, canvas.width, 5);
+
+            // Draw each fan
+            fans.forEach((fan, index) => {
+                const bounceOffset = Math.sin(Date.now() / 200 + index) * fan.bounce;
+
+                // Scarf waving (if has scarf and celebrating)
+                if (fan.hasScarf && fan.armUp) {
+                    fan.scarfWave += 0.2;
+                    const scarfColor = fan.team === 'real' ? '#d4ff00' : '#6bb5e0';
+                    ctx.strokeStyle = scarfColor;
+                    ctx.lineWidth = 4;
+                    ctx.beginPath();
+                    ctx.moveTo(fan.x - 12, fan.y - bounceOffset);
+                    const wave1 = Math.sin(fan.scarfWave) * 8;
+                    const wave2 = Math.sin(fan.scarfWave + 1) * 10;
+                    ctx.quadraticCurveTo(fan.x - 20, fan.y - 15 + wave1 - bounceOffset, fan.x - 30, fan.y - 10 + wave2 - bounceOffset);
+                    ctx.stroke();
+                }
+
+                // Body
+                ctx.fillStyle = fan.team === 'real' ? '#ffffff' : '#6bb5e0';
+                ctx.fillRect(fan.x - 8, fan.y + 15 - bounceOffset, 16, 20);
+
+                // Head
+                ctx.fillStyle = '#f4c7a0';
+                ctx.beginPath();
+                ctx.arc(fan.x, fan.y + 8 - bounceOffset, 10, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Hair
+                ctx.fillStyle = fan.color;
+                ctx.beginPath();
+                ctx.arc(fan.x, fan.y + 3 - bounceOffset, 8, Math.PI, 2 * Math.PI);
+                ctx.fill();
+
+                // Arms
+                if (fan.armUp) {
+                    // Arms up celebrating
+                    ctx.fillStyle = fan.team === 'real' ? '#ffffff' : '#6bb5e0';
+                    ctx.fillRect(fan.x - 15, fan.y + 5 - bounceOffset, 6, 15);
+                    ctx.fillRect(fan.x + 9, fan.y + 5 - bounceOffset, 6, 15);
+
+                    // Hands up
+                    ctx.fillStyle = '#f4c7a0';
+                    ctx.beginPath();
+                    ctx.arc(fan.x - 12, fan.y + 2 - bounceOffset, 5, 0, Math.PI * 2);
+                    ctx.arc(fan.x + 12, fan.y + 2 - bounceOffset, 5, 0, Math.PI * 2);
+                    ctx.fill();
+                } else {
+                    // Arms down
+                    ctx.fillStyle = fan.team === 'real' ? '#ffffff' : '#6bb5e0';
+                    ctx.fillRect(fan.x - 14, fan.y + 18 - bounceOffset, 5, 12);
+                    ctx.fillRect(fan.x + 9, fan.y + 18 - bounceOffset, 5, 12);
+                }
+
+                // Eyes (small dots)
+                ctx.fillStyle = '#333';
+                ctx.beginPath();
+                ctx.arc(fan.x - 3, fan.y + 7 - bounceOffset, 2, 0, Math.PI * 2);
+                ctx.arc(fan.x + 3, fan.y + 7 - bounceOffset, 2, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Mouth (changes based on emotion)
+                ctx.strokeStyle = '#333';
+                ctx.lineWidth = 1.5;
+                ctx.beginPath();
+                if (fan.armUp) {
+                    // Happy open mouth
+                    ctx.arc(fan.x, fan.y + 11 - bounceOffset, 4, 0, Math.PI);
+                } else {
+                    // Neutral mouth
+                    ctx.moveTo(fan.x - 3, fan.y + 12 - bounceOffset);
+                    ctx.lineTo(fan.x + 3, fan.y + 12 - bounceOffset);
+                }
+                ctx.stroke();
+            });
+        }
+
+        // Fan reactions
+        function fansCheer() {
+            fans.forEach((fan, i) => {
+                setTimeout(() => {
+                    fan.armUp = true;
+                    fan.bounce = 3;
+                }, i * 30);
+            });
+
+            // Create floating shout texts
+            for (let i = 0; i < 5; i++) {
+                setTimeout(() => {
+                    createShout('cheer');
+                }, i * 150);
+            }
+
+            // Reset after celebration
+            setTimeout(() => {
+                fans.forEach(fan => {
+                    fan.armUp = false;
+                    fan.bounce = 0;
+                });
+            }, 2000);
+        }
+
+        function fansBoo() {
+            fans.forEach((fan, i) => {
+                fan.bounce = 1;
+            });
+
+            // Create floating shout texts
+            for (let i = 0; i < 3; i++) {
+                setTimeout(() => {
+                    createShout('boo');
+                }, i * 200);
+            }
+
+            // Reset
+            setTimeout(() => {
+                fans.forEach(fan => {
+                    fan.bounce = 0;
+                });
+            }, 1500);
+        }
+
+        function createShout(type) {
+            const shouts = type === 'cheer' ? cheerShouts : booShouts;
+            const shout = document.createElement('div');
+            shout.className = `fan-shout ${type}`;
+            shout.textContent = shouts[Math.floor(Math.random() * shouts.length)];
+
+            // Random position around the canvas
+            const canvasRect = canvas.getBoundingClientRect();
+            const x = canvasRect.left + 100 + Math.random() * (canvas.width - 200);
+            const y = canvasRect.top + 30 + Math.random() * 60;
+
+            shout.style.left = x + 'px';
+            shout.style.top = y + 'px';
+
+            document.body.appendChild(shout);
+
+            // Remove after animation
+            setTimeout(() => {
+                shout.remove();
+            }, 1500);
+        }
+
+        // Draw grass field
+        function drawField() {
+            const fieldTop = 55; // Below the fans
+
+            // Green grass
+            ctx.fillStyle = '#4ade80';
+            ctx.fillRect(0, fieldTop, canvas.width, canvas.height - fieldTop);
+
+            // Darker grass stripes
+            ctx.fillStyle = '#22c55e';
+            for (let i = 0; i < canvas.width; i += 80) {
+                ctx.fillRect(i, fieldTop, 40, canvas.height - fieldTop);
+            }
+
+            // Field lines
+            ctx.strokeStyle = 'white';
+            ctx.lineWidth = 4;
+            ctx.strokeRect(20, fieldTop + 5, canvas.width - 40, canvas.height - fieldTop - 25);
+
+            // Goal area box
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+            ctx.fillRect(20, 80, 150, 340);
+            ctx.strokeRect(20, 80, 150, 340);
+        }
+
+        // Draw the goal
+        function drawGoal() {
+            // Goal frame
+            ctx.fillStyle = '#fff';
+            ctx.fillRect(goal.x, goal.y, goal.width, 10);
+            ctx.fillRect(goal.x, goal.y + goal.height - 10, goal.width, 10);
+            ctx.fillRect(goal.x, goal.y, 10, goal.height);
+
+            // Goal net
+            ctx.strokeStyle = '#ddd';
+            ctx.lineWidth = 2;
+            for (let i = goal.y; i < goal.y + goal.height; i += 20) {
+                ctx.beginPath();
+                ctx.moveTo(goal.x, i);
+                ctx.lineTo(goal.x + goal.width, i);
+                ctx.stroke();
+            }
+            for (let i = goal.x; i < goal.x + goal.width; i += 20) {
+                ctx.beginPath();
+                ctx.moveTo(i, goal.y);
+                ctx.lineTo(i, goal.y + goal.height);
+                ctx.stroke();
+            }
+        }
+
+        // Draw Courtois (Real Madrid goalkeeper)
+        function drawGoalkeeper() {
+            const gk = goalkeeper;
+            const centerX = gk.x + gk.width / 2;
+
+            // Legs (white shorts - Real Madrid style)
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(gk.x + 8, gk.y + gk.height - 15, 12, 30);
+            ctx.fillRect(gk.x + gk.width - 20, gk.y + gk.height - 15, 12, 30);
+
+            // Socks (black)
+            ctx.fillStyle = '#1a1a1a';
+            ctx.fillRect(gk.x + 8, gk.y + gk.height + 10, 12, 15);
+            ctx.fillRect(gk.x + gk.width - 20, gk.y + gk.height + 10, 12, 15);
+
+            // Boots (black)
+            ctx.fillStyle = '#000000';
+            ctx.fillRect(gk.x + 5, gk.y + gk.height + 22, 18, 8);
+            ctx.fillRect(gk.x + gk.width - 23, gk.y + gk.height + 22, 18, 8);
+
+            // Body (Fluorescent yellow/lime goalkeeper jersey - Real Madrid GK style)
+            ctx.fillStyle = '#d4ff00';
+            ctx.fillRect(gk.x, gk.y, gk.width, gk.height - 10);
+
+            // Jersey details - darker stripes
+            ctx.fillStyle = '#b8e600';
+            ctx.fillRect(gk.x, gk.y + 20, gk.width, 8);
+            ctx.fillRect(gk.x, gk.y + 50, gk.width, 8);
+
+            // Number 1 on chest
+            ctx.fillStyle = '#1a1a1a';
+            ctx.font = 'bold 24px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('1', centerX, gk.y + 45);
+
+            // Arms (same jersey color)
+            ctx.fillStyle = '#d4ff00';
+            ctx.fillRect(gk.x - 20, gk.y + 5, 22, 45);
+            ctx.fillRect(gk.x + gk.width - 2, gk.y + 5, 22, 45);
+
+            // Gloves (professional orange/red goalkeeper gloves)
+            ctx.fillStyle = '#ff6b35';
+            ctx.beginPath();
+            ctx.roundRect(gk.x - 25, gk.y + 45, 28, 35, 5);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.roundRect(gk.x + gk.width - 3, gk.y + 45, 28, 35, 5);
+            ctx.fill();
+
+            // Glove palm (lighter)
+            ctx.fillStyle = '#ffaa80';
+            ctx.fillRect(gk.x - 22, gk.y + 50, 22, 25);
+            ctx.fillRect(gk.x + gk.width, gk.y + 50, 22, 25);
+
+            // Head (Courtois is tall with defined face)
+            ctx.fillStyle = '#f4c7a0';
+            ctx.beginPath();
+            ctx.ellipse(centerX, gk.y - 25, 22, 28, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Hair (Courtois has short dark brown hair)
+            ctx.fillStyle = '#3d2314';
+            ctx.beginPath();
+            ctx.ellipse(centerX, gk.y - 45, 20, 15, 0, Math.PI, 2 * Math.PI);
+            ctx.fill();
+            // Side hair
+            ctx.beginPath();
+            ctx.ellipse(centerX - 18, gk.y - 35, 8, 15, 0.3, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.ellipse(centerX + 18, gk.y - 35, 8, 15, -0.3, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Eyebrows (thick, dark)
+            ctx.fillStyle = '#2d1810';
+            ctx.fillRect(centerX - 15, gk.y - 38, 12, 3);
+            ctx.fillRect(centerX + 3, gk.y - 38, 12, 3);
+
+            // Eyes
+            ctx.fillStyle = '#fff';
+            ctx.beginPath();
+            ctx.ellipse(centerX - 9, gk.y - 30, 6, 5, 0, 0, Math.PI * 2);
+            ctx.ellipse(centerX + 9, gk.y - 30, 6, 5, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Pupils (brown eyes)
+            ctx.fillStyle = '#5c4033';
+            ctx.beginPath();
+            ctx.arc(centerX - 9, gk.y - 30, 3, 0, Math.PI * 2);
+            ctx.arc(centerX + 9, gk.y - 30, 3, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Nose
+            ctx.strokeStyle = '#d4a574';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(centerX, gk.y - 28);
+            ctx.lineTo(centerX - 3, gk.y - 18);
+            ctx.lineTo(centerX, gk.y - 16);
+            ctx.stroke();
+
+            // Mouth (slight smile)
+            ctx.strokeStyle = '#8b5a5a';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(centerX, gk.y - 8, 8, 0.15 * Math.PI, 0.85 * Math.PI);
+            ctx.stroke();
+
+            // Ears
+            ctx.fillStyle = '#f4c7a0';
+            ctx.beginPath();
+            ctx.ellipse(centerX - 22, gk.y - 28, 5, 8, 0, 0, Math.PI * 2);
+            ctx.ellipse(centerX + 22, gk.y - 28, 5, 8, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Name above (Courtois)
+            ctx.fillStyle = '#1a1a1a';
+            ctx.font = 'bold 12px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('COURTOIS', centerX, gk.y - 60);
+        }
+
+        // Draw Haaland (Manchester City striker)
+        function drawHaaland() {
+            const st = striker;
+            const centerX = st.x + st.width / 2;
+
+            // Position Haaland near where the ball spawns
+            st.y = ball.active ? ball.y - st.height / 2 : 200;
+            st.y = Math.max(goal.y, Math.min(goal.y + goal.height - st.height, st.y));
+
+            // Legs (white shorts - Man City style)
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(st.x + 8, st.y + st.height - 15, 12, 30);
+            ctx.fillRect(st.x + st.width - 20, st.y + st.height - 15, 12, 30);
+
+            // Socks (sky blue)
+            ctx.fillStyle = '#6bb5e0';
+            ctx.fillRect(st.x + 8, st.y + st.height + 10, 12, 15);
+            ctx.fillRect(st.x + st.width - 20, st.y + st.height + 10, 12, 15);
+
+            // Boots (white/silver)
+            ctx.fillStyle = '#e0e0e0';
+            ctx.fillRect(st.x + 5, st.y + st.height + 22, 18, 8);
+            ctx.fillRect(st.x + st.width - 23, st.y + st.height + 22, 18, 8);
+
+            // Body (Sky blue Manchester City jersey)
+            ctx.fillStyle = '#6bb5e0';
+            ctx.fillRect(st.x, st.y, st.width, st.height - 10);
+
+            // Jersey details - darker accent
+            ctx.fillStyle = '#4a9cc9';
+            ctx.fillRect(st.x, st.y + 25, st.width, 6);
+            ctx.fillRect(st.x, st.y + 55, st.width, 6);
+
+            // Number 9 on chest
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 26px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('9', centerX, st.y + 50);
+
+            // Arms (same jersey color)
+            ctx.fillStyle = '#6bb5e0';
+            ctx.fillRect(st.x - 18, st.y + 5, 20, 40);
+            ctx.fillRect(st.x + st.width - 2, st.y + 5, 20, 40);
+
+            // Hands
+            ctx.fillStyle = '#f4c7a0';
+            ctx.beginPath();
+            ctx.arc(st.x - 8, st.y + 50, 10, 0, Math.PI * 2);
+            ctx.arc(st.x + st.width + 8, st.y + 50, 10, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Head (Haaland has a strong jaw and big build)
+            ctx.fillStyle = '#f4c7a0';
+            ctx.beginPath();
+            ctx.ellipse(centerX, st.y - 25, 24, 28, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Hair (Haaland has blonde hair, often tied back)
+            ctx.fillStyle = '#f5deb3';
+            ctx.beginPath();
+            ctx.ellipse(centerX, st.y - 48, 22, 18, 0, Math.PI, 2 * Math.PI);
+            ctx.fill();
+            // Side hair
+            ctx.beginPath();
+            ctx.ellipse(centerX - 20, st.y - 35, 8, 18, 0.3, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.ellipse(centerX + 20, st.y - 35, 8, 18, -0.3, 0, Math.PI * 2);
+            ctx.fill();
+            // Hair bun/ponytail
+            ctx.beginPath();
+            ctx.arc(centerX, st.y - 55, 12, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Eyebrows (blonde, lighter)
+            ctx.fillStyle = '#d4b896';
+            ctx.fillRect(centerX - 15, st.y - 38, 12, 3);
+            ctx.fillRect(centerX + 3, st.y - 38, 12, 3);
+
+            // Eyes
+            ctx.fillStyle = '#fff';
+            ctx.beginPath();
+            ctx.ellipse(centerX - 9, st.y - 30, 6, 5, 0, 0, Math.PI * 2);
+            ctx.ellipse(centerX + 9, st.y - 30, 6, 5, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Pupils (blue eyes)
+            ctx.fillStyle = '#4a90c9';
+            ctx.beginPath();
+            ctx.arc(centerX - 9, st.y - 30, 3, 0, Math.PI * 2);
+            ctx.arc(centerX + 9, st.y - 30, 3, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Nose
+            ctx.strokeStyle = '#d4a574';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(centerX, st.y - 28);
+            ctx.lineTo(centerX - 3, st.y - 16);
+            ctx.lineTo(centerX + 2, st.y - 14);
+            ctx.stroke();
+
+            // Mouth (confident smile)
+            ctx.strokeStyle = '#8b5a5a';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(centerX, st.y - 6, 10, 0.1 * Math.PI, 0.9 * Math.PI);
+            ctx.stroke();
+
+            // Ears
+            ctx.fillStyle = '#f4c7a0';
+            ctx.beginPath();
+            ctx.ellipse(centerX - 24, st.y - 28, 5, 8, 0, 0, Math.PI * 2);
+            ctx.ellipse(centerX + 24, st.y - 28, 5, 8, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Name above (Haaland)
+            ctx.fillStyle = '#1a1a1a';
+            ctx.font = 'bold 12px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('HAALAND', centerX, st.y - 72);
+        }
+
+        // Draw the soccer ball
+        function drawBall() {
+            if (!ball.active) return;
+
+            // Ball shadow
+            ctx.fillStyle = 'rgba(0,0,0,0.2)';
+            ctx.beginPath();
+            ctx.ellipse(ball.x + 5, ball.y + ball.radius + 8, ball.radius, ball.radius / 3, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Ball
+            ctx.fillStyle = 'white';
+            ctx.beginPath();
+            ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Ball pattern
+            ctx.fillStyle = '#333';
+            const patterns = [
+                { angle: 0, dist: 0 },
+                { angle: 0, dist: 12 },
+                { angle: Math.PI / 2, dist: 12 },
+                { angle: Math.PI, dist: 12 },
+                { angle: -Math.PI / 2, dist: 12 }
+            ];
+
+            patterns.forEach(p => {
+                ctx.beginPath();
+                const px = ball.x + Math.cos(p.angle) * p.dist;
+                const py = ball.y + Math.sin(p.angle) * p.dist;
+                ctx.arc(px, py, 5, 0, Math.PI * 2);
+                ctx.fill();
+            });
+
+            // Ball outline
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+            ctx.stroke();
+        }
+
+        // Move goalkeeper based on keys
+        function moveGoalkeeper() {
+            if (keys.up && goalkeeper.y > goal.y + 10) {
+                goalkeeper.y -= goalkeeper.speed;
+            }
+            if (keys.down && goalkeeper.y + goalkeeper.height < goal.y + goal.height - 10) {
+                goalkeeper.y += goalkeeper.speed;
+            }
+        }
+
+        // Show math quiz
+        function showMathQuiz() {
+            gameRunning = false;
+
+            let num1, num2;
+
+            if (mathDifficulty === 'easy') {
+                // Easy: Addition only, up to 10
+                num1 = Math.floor(Math.random() * 9) + 1; // 1-9
+                num2 = Math.floor(Math.random() * (10 - num1)) + 1; // Result max 10
+                mathAnswer = num1 + num2;
+                mathQuestion.textContent = `${num1} + ${num2} = ?`;
+            } else {
+                // Hard: Addition and subtraction, up to 20
+                const type = Math.random() > 0.5 ? 'add' : 'subtract';
+
+                if (type === 'add') {
+                    num1 = Math.floor(Math.random() * 15) + 1;
+                    num2 = Math.floor(Math.random() * (20 - num1)) + 1;
+                    mathAnswer = num1 + num2;
+                    mathQuestion.textContent = `${num1} + ${num2} = ?`;
+                } else {
+                    num1 = Math.floor(Math.random() * 15) + 5;
+                    num2 = Math.floor(Math.random() * (num1 - 1)) + 1;
+                    mathAnswer = num1 - num2;
+                    mathQuestion.textContent = `${num1} - ${num2} = ?`;
+                }
+            }
+
+            mathInput.value = '';
+            mathResult.textContent = '';
+            mathResult.className = 'quiz-result';
+            mathQuiz.style.display = 'flex';
+            setTimeout(() => mathInput.focus(), 100);
+        }
+
+        // Check math answer
+        function checkMathAnswer() {
+            const userAnswer = parseInt(mathInput.value);
+
+            if (isNaN(userAnswer)) {
+                mathResult.textContent = 'הכנס מספר!';
+                mathResult.className = 'quiz-result wrong';
+                return;
+            }
+
+            if (userAnswer === mathAnswer) {
+                mathResult.textContent = 'נכון! +5 נקודות!';
+                mathResult.className = 'quiz-result correct';
+                bonusPoints += 5;
+                bonusElement.textContent = bonusPoints;
+                playBonusSound(); // Play success sound
+
+                setTimeout(() => {
+                    mathQuiz.style.display = 'none';
+                    gameRunning = true;
+                    // Show bonus message
+                    bonusMessage.style.display = 'block';
+                    setTimeout(() => {
+                        bonusMessage.style.display = 'none';
+                    }, 1500);
+                    setTimeout(shootBall, 1000);
+                }, 1500);
+            } else {
+                mathResult.textContent = `לא נכון... התשובה היא ${mathAnswer}`;
+                mathResult.className = 'quiz-result wrong';
+
+                setTimeout(() => {
+                    mathQuiz.style.display = 'none';
+                    gameRunning = true;
+                    setTimeout(shootBall, 1000);
+                }, 2000);
+            }
+        }
+
+        // Show reading quiz
+        function showReadingQuiz() {
+            gameRunning = false;
+
+            // Pick a random quiz
+            const quiz = readingQuizzes[Math.floor(Math.random() * readingQuizzes.length)];
+            readingPicture.textContent = quiz.picture;
+
+            // Create shuffled options
+            const options = [quiz.correct, ...quiz.wrong];
+            shuffleArray(options);
+            currentReadingAnswer = options.indexOf(quiz.correct);
+
+            // Update buttons
+            readingOptions.innerHTML = '';
+            options.forEach((option, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'reading-option';
+                btn.textContent = option;
+                btn.onclick = () => checkReadingAnswer(index);
+                readingOptions.appendChild(btn);
+            });
+
+            readingResult.textContent = '';
+            readingResult.className = 'quiz-result';
+            readingQuiz.style.display = 'flex';
+        }
+
+        // Check reading answer
+        function checkReadingAnswer(index) {
+            const buttons = readingOptions.querySelectorAll('.reading-option');
+
+            if (index === currentReadingAnswer) {
+                buttons[index].classList.add('selected');
+                readingResult.textContent = 'נכון! +5 נקודות!';
+                readingResult.className = 'quiz-result correct';
+                bonusPoints += 5;
+                bonusElement.textContent = bonusPoints;
+                playBonusSound(); // Play success sound
+
+                setTimeout(() => {
+                    readingQuiz.style.display = 'none';
+                    gameRunning = true;
+                    bonusMessage.style.display = 'block';
+                    setTimeout(() => {
+                        bonusMessage.style.display = 'none';
+                    }, 1500);
+                    setTimeout(shootBall, 1000);
+                }, 1500);
+            } else {
+                buttons[index].classList.add('wrong-selected');
+                buttons[currentReadingAnswer].classList.add('selected');
+                readingResult.textContent = 'לא נכון...';
+                readingResult.className = 'quiz-result wrong';
+
+                setTimeout(() => {
+                    readingQuiz.style.display = 'none';
+                    gameRunning = true;
+                    setTimeout(shootBall, 1000);
+                }, 2000);
+            }
+        }
+
+        // Shuffle array helper
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        // Shoot ball from right side
+        function shootBall() {
+            if (!gameRunning) return;
+
+            // Check if it's time for a quiz (every 10 balls, only once per round)
+            if (totalBalls > 0 && totalBalls % 10 === 0 && !quizShownForRound) {
+                quizShownForRound = true;
+                // Alternate between math and reading quiz
+                if (Math.random() > 0.5) {
+                    showMathQuiz();
+                } else {
+                    showReadingQuiz();
+                }
+                return;
+            }
+
+            // Reset quiz flag when we move past the 10-ball mark
+            if (totalBalls % 10 !== 0) {
+                quizShownForRound = false;
+            }
+
+            ball.active = true;
+            ball.x = 520;
+            ball.y = goal.y + 30 + Math.random() * (goal.height - 60);
+
+            // Random speed and slight vertical movement
+            const speed = 6 + Math.random() * 4;
+            ball.velocityX = -speed;
+            ball.velocityY = (Math.random() - 0.5) * 4;
+
+            // Play kick sound
+            playKickSound();
+        }
+
+        // Update ball position
+        function updateBall() {
+            if (!ball.active) return;
+
+            ball.x += ball.velocityX;
+            ball.y += ball.velocityY;
+
+            // Bounce off top/bottom
+            if (ball.y - ball.radius < 0 || ball.y + ball.radius > canvas.height) {
+                ball.velocityY *= -1;
+                ball.y = Math.max(ball.radius, Math.min(canvas.height - ball.radius, ball.y));
+            }
+
+            // Check if goalkeeper saves
+            if (ball.x - ball.radius < goalkeeper.x + goalkeeper.width + 15 &&
+                ball.x > goalkeeper.x &&
+                ball.y > goalkeeper.y - 30 &&
+                ball.y < goalkeeper.y + goalkeeper.height + 30) {
+                // SAVE!
+                saves++;
+                totalBalls++;
+                savesElement.textContent = saves;
+                showMessage('save');
+                ball.active = false;
+
+                if (totalBalls >= maxBalls) {
+                    setTimeout(endGame, 1500);
+                } else {
+                    setTimeout(shootBall, 1500);
+                }
+                return;
+            }
+
+            // Check if ball went into goal (missed)
+            if (ball.x < goal.x + goal.width) {
+                if (ball.y > goal.y && ball.y < goal.y + goal.height) {
+                    // GOAL (missed save)
+                    missed++;
+                    totalBalls++;
+                    missedElement.textContent = missed;
+                    showMessage('miss');
+                    ball.active = false;
+
+                    if (totalBalls >= maxBalls) {
+                        setTimeout(endGame, 1500);
+                    } else {
+                        setTimeout(shootBall, 1500);
+                    }
+                    return;
+                }
+            }
+
+            // Ball went off screen (hit post)
+            if (ball.x < -50) {
+                ball.active = false;
+                totalBalls++;
+                remainingElement.textContent = maxBalls - totalBalls;
+                if (totalBalls >= maxBalls) {
+                    setTimeout(endGame, 1000);
+                } else {
+                    setTimeout(shootBall, 1000);
+                }
+            }
+        }
+
+        function showMessage(type) {
+            if (type === 'save') {
+                saveMessage.style.display = 'block';
+                setTimeout(() => { saveMessage.style.display = 'none'; }, 1000);
+                playSaveSound(); // Sound effect
+                fansCheer(); // Fans celebrate the save!
+            } else {
+                missMessage.style.display = 'block';
+                setTimeout(() => { missMessage.style.display = 'none'; }, 1000);
+                playGoalSound(); // Sound effect
+                fansBoo(); // Fans are disappointed
+            }
+            // Update remaining balls
+            remainingElement.textContent = maxBalls - totalBalls;
+        }
+
+        function endGame() {
+            gameRunning = false;
+            playGameOverSound();
+            const totalScore = saves + bonusPoints;
+            const percentage = Math.round((saves / maxBalls) * 100);
+            let message = '';
+            if (percentage >= 80) {
+                message = 'מדהים! אתה שוער אלוף!';
+            } else if (percentage >= 60) {
+                message = 'כל הכבוד! שיחקת מעולה!';
+            } else if (percentage >= 40) {
+                message = 'לא רע! תמשיך להתאמן!';
+            } else {
+                message = 'נסה שוב! אתה יכול יותר!';
+            }
+            finalScoreElement.innerHTML = `${message}<br><br>עצרת ${saves} מתוך ${maxBalls} כדורים!<br>נקודות בונוס: ${bonusPoints}<br>סה"כ: ${totalScore} נקודות!`;
+            gameOverScreen.style.display = 'flex';
+        }
+
+        // Reset entire game
+        function resetGame() {
+            saves = 0;
+            missed = 0;
+            bonusPoints = 0;
+            totalBalls = 0;
+            quizShownForRound = false;
+            savesElement.textContent = saves;
+            missedElement.textContent = missed;
+            bonusElement.textContent = bonusPoints;
+            remainingElement.textContent = maxBalls;
+            gameOverScreen.style.display = 'none';
+            mathQuiz.style.display = 'none';
+            readingQuiz.style.display = 'none';
+            gameRunning = false;
+            ball.active = false;
+            goalkeeper.y = 200;
+            // Reset fans
+            fans.forEach(fan => {
+                fan.armUp = false;
+                fan.bounce = 0;
+            });
+            // Show difficulty selection again
+            startScreen.style.display = 'flex';
+        }
+
+        // Draw arrow keys hint
+        function drawArrowHint() {
+            ctx.fillStyle = 'rgba(255,255,255,0.9)';
+            ctx.fillRect(10, canvas.height - 90, 80, 70);
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(10, canvas.height - 90, 80, 70);
+
+            // Up arrow
+            ctx.fillStyle = '#3b82f6';
+            ctx.beginPath();
+            ctx.moveTo(50, canvas.height - 75);
+            ctx.lineTo(40, canvas.height - 60);
+            ctx.lineTo(60, canvas.height - 60);
+            ctx.closePath();
+            ctx.fill();
+
+            // Down arrow
+            ctx.beginPath();
+            ctx.moveTo(50, canvas.height - 35);
+            ctx.lineTo(40, canvas.height - 50);
+            ctx.lineTo(60, canvas.height - 50);
+            ctx.closePath();
+            ctx.fill();
+        }
+
+        // Draw ball counter
+        function drawBallCounter() {
+            ctx.fillStyle = 'rgba(0,0,0,0.7)';
+            ctx.fillRect(canvas.width - 110, 58, 100, 40);
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 14px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText(`כדור: ${totalBalls + 1} / ${maxBalls}`, canvas.width - 60, 75);
+
+            // Show next quiz indicator
+            const ballsToQuiz = 10 - (totalBalls % 10);
+            if (ballsToQuiz <= 3 && totalBalls > 0 && totalBalls < maxBalls) {
+                ctx.fillStyle = '#fbbf24';
+                ctx.font = '12px Arial';
+                ctx.fillText(`תרגיל בעוד ${ballsToQuiz}!`, canvas.width - 60, 92);
+            }
+        }
+
+        // Game loop
+        function gameLoop() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            drawFans();      // Draw fans first (in the stands)
+            drawField();
+            drawGoal();
+            moveGoalkeeper();
+            drawGoalkeeper();
+            drawHaaland();
+            updateBall();
+            drawBall();
+            drawArrowHint();
+            drawBallCounter();
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        // Start the game loop (but wait for difficulty selection)
+        gameLoop();
+    </script>
+</body>
+</html>
