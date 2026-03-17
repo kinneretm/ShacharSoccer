@@ -396,6 +396,158 @@
             color: rgba(255,255,255,0.9);
         }
 
+        /* Player selection */
+        .player-options {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .player-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 25px;
+            border: 4px solid transparent;
+            border-radius: 20px;
+            cursor: pointer;
+            font-family: Arial, sans-serif;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+            transition: all 0.2s;
+            min-width: 140px;
+        }
+
+        .player-btn:hover {
+            transform: scale(1.08);
+            border-color: #fbbf24;
+        }
+
+        .player-btn.courtois {
+            background: linear-gradient(45deg, #d4ff00, #b8e600);
+        }
+
+        .player-btn.raya {
+            background: linear-gradient(45deg, #ef4444, #dc2626);
+        }
+
+        .player-btn.yermakov {
+            background: linear-gradient(45deg, #22c55e, #16a34a);
+        }
+
+        .player-icon {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+
+        .player-name {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: white;
+            margin-bottom: 5px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+
+        .player-team {
+            font-size: 0.95rem;
+            color: rgba(255,255,255,0.9);
+        }
+
+        /* Color selection */
+        .color-options {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .color-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 15px 20px;
+            border: 4px solid rgba(255,255,255,0.3);
+            border-radius: 15px;
+            cursor: pointer;
+            font-family: Arial, sans-serif;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            transition: all 0.2s;
+            min-width: 80px;
+        }
+
+        .color-btn:hover {
+            transform: scale(1.1);
+            border-color: #fbbf24;
+        }
+
+        .color-btn.white {
+            background: linear-gradient(45deg, #ffffff, #e0e0e0);
+        }
+
+        .color-btn.yellow {
+            background: linear-gradient(45deg, #ffdd00, #ffcc00);
+        }
+
+        .color-btn.red {
+            background: linear-gradient(45deg, #ef4444, #dc2626);
+        }
+
+        .color-btn.green {
+            background: linear-gradient(45deg, #22c55e, #16a34a);
+        }
+
+        .color-btn.black {
+            background: linear-gradient(45deg, #333333, #1a1a1a);
+        }
+
+        .color-swatch {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-bottom: 8px;
+            border: 3px solid rgba(255,255,255,0.5);
+        }
+
+        .color-btn.white .color-swatch {
+            background: #ffffff;
+            border-color: #ccc;
+        }
+
+        .color-btn.yellow .color-swatch {
+            background: #ffdd00;
+        }
+
+        .color-btn.red .color-swatch {
+            background: #ef4444;
+        }
+
+        .color-btn.green .color-swatch {
+            background: #22c55e;
+        }
+
+        .color-btn.black .color-swatch {
+            background: #1a1a1a;
+        }
+
+        .color-name {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+
+        .color-btn.white .color-name {
+            color: #333;
+            text-shadow: none;
+        }
+
+        .color-btn.yellow .color-name {
+            color: #333;
+            text-shadow: none;
+        }
+
 
         /* Mobile responsive styles */
         @media (max-width: 750px) {
@@ -489,6 +641,42 @@
                 font-size: 1.5rem;
             }
 
+            .player-options {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .player-btn {
+                padding: 15px 30px;
+                min-width: auto;
+            }
+
+            .player-icon {
+                font-size: 2rem;
+            }
+
+            .player-name {
+                font-size: 1.1rem;
+            }
+
+            .color-options {
+                gap: 10px;
+            }
+
+            .color-btn {
+                padding: 12px 15px;
+                min-width: 60px;
+            }
+
+            .color-swatch {
+                width: 30px;
+                height: 30px;
+            }
+
+            .color-name {
+                font-size: 0.95rem;
+            }
+
             .game-over h2 {
                 font-size: 2rem;
             }
@@ -551,8 +739,63 @@
         <button class="restart-btn" onclick="resetGame()">שחק שוב!</button>
     </div>
 
-    <!-- Start Screen -->
-    <div class="quiz-popup" id="startScreen" style="display: flex;">
+    <!-- Player Selection Screen -->
+    <div class="quiz-popup" id="playerSelectScreen" style="display: flex;">
+        <div class="quiz-content">
+            <h2>שחר השוער!</h2>
+            <p class="subtitle">בחר את השוער שלך:</p>
+            <div class="player-options">
+                <button class="player-btn courtois" onclick="selectPlayer('courtois')">
+                    <span class="player-icon">🧤</span>
+                    <span class="player-name">קורטואה</span>
+                    <span class="player-team">ריאל מדריד</span>
+                </button>
+                <button class="player-btn raya" onclick="selectPlayer('raya')">
+                    <span class="player-icon">🧤</span>
+                    <span class="player-name">דויד ראיה</span>
+                    <span class="player-team">ארסנל</span>
+                </button>
+                <button class="player-btn yermakov" onclick="selectPlayer('yermakov')">
+                    <span class="player-icon">🧤</span>
+                    <span class="player-name">גאורגי ירמקוב</span>
+                    <span class="player-team">מכבי חיפה</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Color Selection Screen -->
+    <div class="quiz-popup" id="colorSelectScreen" style="display: none;">
+        <div class="quiz-content">
+            <h2>בחר צבע חולצה:</h2>
+            <p class="subtitle" id="selectedPlayerName"></p>
+            <div class="color-options">
+                <button class="color-btn white" onclick="selectColor('white')">
+                    <div class="color-swatch"></div>
+                    <span class="color-name">לבן</span>
+                </button>
+                <button class="color-btn yellow" onclick="selectColor('yellow')">
+                    <div class="color-swatch"></div>
+                    <span class="color-name">צהוב</span>
+                </button>
+                <button class="color-btn red" onclick="selectColor('red')">
+                    <div class="color-swatch"></div>
+                    <span class="color-name">אדום</span>
+                </button>
+                <button class="color-btn green" onclick="selectColor('green')">
+                    <div class="color-swatch"></div>
+                    <span class="color-name">ירוק</span>
+                </button>
+                <button class="color-btn black" onclick="selectColor('black')">
+                    <div class="color-swatch"></div>
+                    <span class="color-name">שחור</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Difficulty Selection Screen -->
+    <div class="quiz-popup" id="startScreen" style="display: none;">
         <div class="quiz-content">
             <h2>שחר השוער!</h2>
             <p class="subtitle">בחר רמת קושי לתרגילי חשבון:</p>
@@ -630,6 +873,90 @@
         let mathDifficulty = 'easy'; // 'easy' = addition up to 10, 'hard' = add/subtract up to 20
         const remainingElement = document.getElementById('remaining');
         const startScreen = document.getElementById('startScreen');
+        const playerSelectScreen = document.getElementById('playerSelectScreen');
+        const colorSelectScreen = document.getElementById('colorSelectScreen');
+        const selectedPlayerNameEl = document.getElementById('selectedPlayerName');
+
+        // Player and color selection
+        let selectedPlayer = 'courtois';
+        let selectedJerseyColor = null;
+
+        const jerseyColors = {
+            white: { main: '#ffffff', accent: '#e0e0e0', textColor: '#333333' },
+            yellow: { main: '#ffdd00', accent: '#e6c800', textColor: '#333333' },
+            red: { main: '#ef4444', accent: '#dc2626', textColor: '#ffffff' },
+            green: { main: '#22c55e', accent: '#16a34a', textColor: '#ffffff' },
+            black: { main: '#1a1a1a', accent: '#333333', textColor: '#ffffff' }
+        };
+
+        const playerData = {
+            courtois: {
+                name: 'COURTOIS',
+                team: 'ריאל מדריד',
+                jerseyColor: '#d4ff00',
+                jerseyAccent: '#b8e600',
+                hairColor: '#3d2314',
+                skinColor: '#f4c7a0',
+                eyeColor: '#5c4033',
+                number: '1',
+                gloveColor: '#ff6b35',
+                glovePalm: '#ffaa80',
+                hasBun: false,
+                hasBeard: false
+            },
+            raya: {
+                name: 'DAVID RAYA',
+                team: 'ארסנל',
+                jerseyColor: '#e4ff1a',  // Arsenal neon yellow GK kit
+                jerseyAccent: '#c8e600',
+                hairColor: '#1a1a1a',    // Black hair
+                skinColor: '#d4a574',    // Spanish complexion
+                eyeColor: '#2d1810',     // Dark brown eyes
+                number: '22',
+                gloveColor: '#ff2222',   // Red Arsenal gloves
+                glovePalm: '#ff6666',
+                hasBun: true,
+                hasBeard: true
+            },
+            yermakov: {
+                name: 'YERMAKOV',
+                team: 'מכבי חיפה',
+                jerseyColor: '#22c55e',
+                jerseyAccent: '#16a34a',
+                hairColor: '#8B4513',
+                skinColor: '#f4c7a0',
+                eyeColor: '#4a6741',
+                number: '12',
+                gloveColor: '#333333',
+                glovePalm: '#666666',
+                hasBun: false,
+                hasBeard: false
+            }
+        };
+
+        const hebrewNames = {
+            'courtois': 'קורטואה',
+            'raya': 'דויד ראיה',
+            'yermakov': 'ירמקוב'
+        };
+
+        // Select player function
+        function selectPlayer(player) {
+            selectedPlayer = player;
+            playerSelectScreen.style.display = 'none';
+            colorSelectScreen.style.display = 'flex';
+            // Show player name on color selection screen
+            selectedPlayerNameEl.textContent = hebrewNames[player];
+        }
+
+        // Select jersey color function
+        function selectColor(color) {
+            selectedJerseyColor = color;
+            colorSelectScreen.style.display = 'none';
+            startScreen.style.display = 'flex';
+            // Update instructions text
+            document.querySelector('.instructions').innerHTML = `גע במסך להזיז את ${hebrewNames[selectedPlayer]} ולעצור את הכדור!`;
+        }
 
         // Start game with selected difficulty
         function startWithDifficulty(difficulty) {
@@ -1223,12 +1550,13 @@
             }
         }
 
-        // Draw Courtois (Real Madrid goalkeeper)
+        // Draw goalkeeper based on selected player
         function drawGoalkeeper() {
             const gk = goalkeeper;
             const centerX = gk.x + gk.width / 2;
+            const player = playerData[selectedPlayer];
 
-            // Legs (white shorts - Real Madrid style)
+            // Legs (white shorts)
             ctx.fillStyle = '#ffffff';
             ctx.fillRect(gk.x + 8, gk.y + gk.height - 15, 12, 30);
             ctx.fillRect(gk.x + gk.width - 20, gk.y + gk.height - 15, 12, 30);
@@ -1243,28 +1571,32 @@
             ctx.fillRect(gk.x + 5, gk.y + gk.height + 22, 18, 8);
             ctx.fillRect(gk.x + gk.width - 23, gk.y + gk.height + 22, 18, 8);
 
-            // Body (Fluorescent yellow/lime goalkeeper jersey - Real Madrid GK style)
-            ctx.fillStyle = '#d4ff00';
+            // Get jersey colors (use selected color or player default)
+            const jersey = selectedJerseyColor ? jerseyColors[selectedJerseyColor] :
+                          { main: player.jerseyColor, accent: player.jerseyAccent, textColor: '#1a1a1a' };
+
+            // Body (jersey)
+            ctx.fillStyle = jersey.main;
             ctx.fillRect(gk.x, gk.y, gk.width, gk.height - 10);
 
             // Jersey details - darker stripes
-            ctx.fillStyle = '#b8e600';
+            ctx.fillStyle = jersey.accent;
             ctx.fillRect(gk.x, gk.y + 20, gk.width, 8);
             ctx.fillRect(gk.x, gk.y + 50, gk.width, 8);
 
-            // Number 1 on chest
-            ctx.fillStyle = '#1a1a1a';
+            // Number on chest
+            ctx.fillStyle = jersey.textColor;
             ctx.font = 'bold 24px Arial';
             ctx.textAlign = 'center';
-            ctx.fillText('1', centerX, gk.y + 45);
+            ctx.fillText(player.number, centerX, gk.y + 45);
 
             // Arms (same jersey color)
-            ctx.fillStyle = '#d4ff00';
+            ctx.fillStyle = jersey.main;
             ctx.fillRect(gk.x - 20, gk.y + 5, 22, 45);
             ctx.fillRect(gk.x + gk.width - 2, gk.y + 5, 22, 45);
 
-            // Gloves (professional orange/red goalkeeper gloves)
-            ctx.fillStyle = '#ff6b35';
+            // Gloves
+            ctx.fillStyle = player.gloveColor;
             ctx.beginPath();
             ctx.roundRect(gk.x - 25, gk.y + 45, 28, 35, 5);
             ctx.fill();
@@ -1273,18 +1605,18 @@
             ctx.fill();
 
             // Glove palm (lighter)
-            ctx.fillStyle = '#ffaa80';
+            ctx.fillStyle = player.glovePalm;
             ctx.fillRect(gk.x - 22, gk.y + 50, 22, 25);
             ctx.fillRect(gk.x + gk.width, gk.y + 50, 22, 25);
 
-            // Head (Courtois is tall with defined face)
-            ctx.fillStyle = '#f4c7a0';
+            // Head
+            ctx.fillStyle = player.skinColor;
             ctx.beginPath();
             ctx.ellipse(centerX, gk.y - 25, 22, 28, 0, 0, Math.PI * 2);
             ctx.fill();
 
-            // Hair (Courtois has short dark brown hair)
-            ctx.fillStyle = '#3d2314';
+            // Hair
+            ctx.fillStyle = player.hairColor;
             ctx.beginPath();
             ctx.ellipse(centerX, gk.y - 45, 20, 15, 0, Math.PI, 2 * Math.PI);
             ctx.fill();
@@ -1296,8 +1628,49 @@
             ctx.ellipse(centerX + 18, gk.y - 35, 8, 15, -0.3, 0, Math.PI * 2);
             ctx.fill();
 
+            // Hair bun (for Raya) - distinctive top knot
+            if (player.hasBun) {
+                // Hair tie
+                ctx.fillStyle = '#222';
+                ctx.beginPath();
+                ctx.ellipse(centerX, gk.y - 52, 8, 5, 0, 0, Math.PI * 2);
+                ctx.fill();
+                // The bun itself - prominent on top
+                ctx.fillStyle = player.hairColor;
+                ctx.beginPath();
+                ctx.arc(centerX, gk.y - 62, 12, 0, Math.PI * 2);
+                ctx.fill();
+                // Extra hair volume going up to bun
+                ctx.beginPath();
+                ctx.moveTo(centerX - 8, gk.y - 45);
+                ctx.quadraticCurveTo(centerX - 10, gk.y - 55, centerX - 5, gk.y - 58);
+                ctx.lineTo(centerX + 5, gk.y - 58);
+                ctx.quadraticCurveTo(centerX + 10, gk.y - 55, centerX + 8, gk.y - 45);
+                ctx.fill();
+            }
+
+            // Beard (for Raya) - full thick beard
+            if (player.hasBeard) {
+                ctx.fillStyle = player.hairColor;
+                // Main beard shape - fuller and more prominent
+                ctx.beginPath();
+                ctx.moveTo(centerX - 18, gk.y - 20);
+                ctx.quadraticCurveTo(centerX - 22, gk.y - 5, centerX - 15, gk.y + 8);
+                ctx.quadraticCurveTo(centerX, gk.y + 15, centerX + 15, gk.y + 8);
+                ctx.quadraticCurveTo(centerX + 22, gk.y - 5, centerX + 18, gk.y - 20);
+                ctx.fill();
+                // Mustache
+                ctx.beginPath();
+                ctx.ellipse(centerX, gk.y - 12, 12, 5, 0, 0, Math.PI);
+                ctx.fill();
+                // Chin beard detail
+                ctx.beginPath();
+                ctx.ellipse(centerX, gk.y + 5, 10, 8, 0, 0, Math.PI);
+                ctx.fill();
+            }
+
             // Eyebrows (thick, dark)
-            ctx.fillStyle = '#2d1810';
+            ctx.fillStyle = player.hairColor;
             ctx.fillRect(centerX - 15, gk.y - 38, 12, 3);
             ctx.fillRect(centerX + 3, gk.y - 38, 12, 3);
 
@@ -1308,8 +1681,8 @@
             ctx.ellipse(centerX + 9, gk.y - 30, 6, 5, 0, 0, Math.PI * 2);
             ctx.fill();
 
-            // Pupils (brown eyes)
-            ctx.fillStyle = '#5c4033';
+            // Pupils
+            ctx.fillStyle = player.eyeColor;
             ctx.beginPath();
             ctx.arc(centerX - 9, gk.y - 30, 3, 0, Math.PI * 2);
             ctx.arc(centerX + 9, gk.y - 30, 3, 0, Math.PI * 2);
@@ -1332,17 +1705,17 @@
             ctx.stroke();
 
             // Ears
-            ctx.fillStyle = '#f4c7a0';
+            ctx.fillStyle = player.skinColor;
             ctx.beginPath();
             ctx.ellipse(centerX - 22, gk.y - 28, 5, 8, 0, 0, Math.PI * 2);
             ctx.ellipse(centerX + 22, gk.y - 28, 5, 8, 0, 0, Math.PI * 2);
             ctx.fill();
 
-            // Name above (Courtois)
+            // Name above
             ctx.fillStyle = '#1a1a1a';
             ctx.font = 'bold 12px Arial';
             ctx.textAlign = 'center';
-            ctx.fillText('COURTOIS', centerX, gk.y - 60);
+            ctx.fillText(player.name, centerX, gk.y - 60);
         }
 
         // Draw Haaland (Manchester City striker)
@@ -1822,6 +2195,7 @@
             bonusPoints = 0;
             totalBalls = 0;
             quizShownForRound = false;
+            selectedJerseyColor = null;
             savesElement.textContent = saves;
             missedElement.textContent = missed;
             bonusElement.textContent = bonusPoints;
@@ -1829,6 +2203,8 @@
             gameOverScreen.style.display = 'none';
             mathQuiz.style.display = 'none';
             readingQuiz.style.display = 'none';
+            startScreen.style.display = 'none';
+            colorSelectScreen.style.display = 'none';
             gameRunning = false;
             ball.active = false;
             goalkeeper.y = 200;
@@ -1837,8 +2213,8 @@
                 fan.armUp = false;
                 fan.bounce = 0;
             });
-            // Show difficulty selection again
-            startScreen.style.display = 'flex';
+            // Show player selection again
+            playerSelectScreen.style.display = 'flex';
         }
 
         // Draw touch hint (hand icon) - shown briefly
