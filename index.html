@@ -379,6 +379,14 @@
             background: linear-gradient(45deg, #f59e0b, #fbbf24);
         }
 
+        .difficulty-btn.goalkeeper-role {
+            background: linear-gradient(45deg, #3b82f6, #60a5fa);
+        }
+
+        .difficulty-btn.striker-role {
+            background: linear-gradient(45deg, #ef4444, #f87171);
+        }
+
         .diff-icon {
             font-size: 2rem;
             margin-bottom: 10px;
@@ -434,6 +442,49 @@
 
         .player-btn.yermakov {
             background: linear-gradient(45deg, #22c55e, #16a34a);
+        }
+
+        .player-btn.haaland {
+            background: linear-gradient(45deg, #6bb5e0, #4a9cc9);
+        }
+
+        .player-btn.mbappe {
+            background: linear-gradient(45deg, #ffffff, #e0e0e0);
+        }
+
+        .player-btn.mbappe .player-name,
+        .player-btn.mbappe .player-team {
+            color: #333;
+            text-shadow: none;
+        }
+
+        .player-btn.vinicius {
+            background: linear-gradient(45deg, #f0f0f0, #d4d4d4);
+        }
+
+        .player-btn.vinicius .player-name,
+        .player-btn.vinicius .player-team {
+            color: #333;
+            text-shadow: none;
+        }
+
+        .player-btn.salah {
+            background: linear-gradient(45deg, #c8102e, #a00d24);
+        }
+
+        .player-btn.shachar {
+            background: linear-gradient(45deg, #fbbf24, #f59e0b);
+            border: 3px solid #fff;
+        }
+
+        .player-btn.shachar .player-name {
+            color: #333;
+            text-shadow: none;
+        }
+
+        .player-btn.shachar .player-team {
+            color: #666;
+            text-shadow: none;
         }
 
         .player-icon {
@@ -713,9 +764,9 @@
     <div class="game-container">
         <h1>שחר השוער!</h1>
         <div class="score-board">
-            הצלות: <span class="score" id="saves">0</span>
+            <span id="scoreLabel">הצלות</span>: <span class="score" id="saves">0</span>
             &nbsp;&nbsp;|&nbsp;&nbsp;
-            החמצות: <span class="missed" id="missed">0</span>
+            <span id="missedLabel">החמצות</span>: <span class="missed" id="missed">0</span>
             &nbsp;&nbsp;|&nbsp;&nbsp;
             בונוס: <span class="bonus" id="bonus">0</span>
             &nbsp;&nbsp;|&nbsp;&nbsp;
@@ -739,8 +790,28 @@
         <button class="restart-btn" onclick="resetGame()">שחק שוב!</button>
     </div>
 
+    <!-- Role Selection Screen (FIRST) -->
+    <div class="quiz-popup" id="roleSelectScreen" style="display: flex;">
+        <div class="quiz-content">
+            <h2>שחר השוער!</h2>
+            <p class="subtitle">מה אתה רוצה להיות?</p>
+            <div class="difficulty-options">
+                <button class="difficulty-btn goalkeeper-role" onclick="selectRole('goalkeeper')">
+                    <span class="diff-icon">🧤</span>
+                    <span class="diff-title">שוער</span>
+                    <span class="diff-desc">עצור את הכדורים!</span>
+                </button>
+                <button class="difficulty-btn striker-role" onclick="selectRole('striker')">
+                    <span class="diff-icon">⚽</span>
+                    <span class="diff-title">חלוץ</span>
+                    <span class="diff-desc">הבקע שערים!</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Player Selection Screen -->
-    <div class="quiz-popup" id="playerSelectScreen" style="display: flex;">
+    <div class="quiz-popup" id="playerSelectScreen" style="display: none;">
         <div class="quiz-content">
             <h2>שחר השוער!</h2>
             <p class="subtitle">בחר את השוער שלך:</p>
@@ -789,6 +860,61 @@
                 <button class="color-btn black" onclick="selectColor('black')">
                     <div class="color-swatch"></div>
                     <span class="color-name">שחור</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Opponent Selection Screen (for goalkeeper mode - choose striker) -->
+    <div class="quiz-popup" id="strikerSelectScreen" style="display: none;">
+        <div class="quiz-content">
+            <h2>בחר את היריב שלך:</h2>
+            <p class="subtitle">נגד מי תשחק?</p>
+            <div class="player-options">
+                <button class="player-btn haaland" onclick="selectStriker('haaland')">
+                    <span class="player-icon">⚽</span>
+                    <span class="player-name">הארלנד</span>
+                    <span class="player-team">מנצ'סטר סיטי</span>
+                </button>
+                <button class="player-btn mbappe" onclick="selectStriker('mbappe')">
+                    <span class="player-icon">⚡</span>
+                    <span class="player-name">מבאפה</span>
+                    <span class="player-team">ריאל מדריד</span>
+                </button>
+                <button class="player-btn vinicius" onclick="selectStriker('vinicius')">
+                    <span class="player-icon">💫</span>
+                    <span class="player-name">ויניסיוס</span>
+                    <span class="player-team">ריאל מדריד</span>
+                </button>
+                <button class="player-btn salah" onclick="selectStriker('salah')">
+                    <span class="player-icon">👑</span>
+                    <span class="player-name">סלאח</span>
+                    <span class="player-team">ליברפול</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Goalkeeper Selection Screen (for striker mode - choose opponent goalkeeper) -->
+    <div class="quiz-popup" id="goalkeeperSelectScreen" style="display: none;">
+        <div class="quiz-content">
+            <h2>בחר את השוער היריב:</h2>
+            <p class="subtitle">נגד מי תבקיע?</p>
+            <div class="player-options">
+                <button class="player-btn courtois" onclick="selectOpponentGoalkeeper('courtois')">
+                    <span class="player-icon">🧤</span>
+                    <span class="player-name">קורטואה</span>
+                    <span class="player-team">ריאל מדריד</span>
+                </button>
+                <button class="player-btn raya" onclick="selectOpponentGoalkeeper('raya')">
+                    <span class="player-icon">🧤</span>
+                    <span class="player-name">דויד ראיה</span>
+                    <span class="player-team">ארסנל</span>
+                </button>
+                <button class="player-btn yermakov" onclick="selectOpponentGoalkeeper('yermakov')">
+                    <span class="player-icon">🧤</span>
+                    <span class="player-name">גאורגי ירמקוב</span>
+                    <span class="player-team">מכבי חיפה</span>
                 </button>
             </div>
         </div>
@@ -870,6 +996,8 @@
         let mathAnswer = 0;
         let quizShownForRound = false;
         let currentReadingAnswer = 0;
+        let currentOddOneOutAnswer = 0; // For hard mode odd-one-out quizzes
+        let isOddOneOutQuiz = false; // Track which type of reading quiz is showing
         let mathDifficulty = 'easy'; // 'easy' = addition up to 10, 'hard' = add/subtract up to 20
         const remainingElement = document.getElementById('remaining');
         const startScreen = document.getElementById('startScreen');
@@ -877,9 +1005,21 @@
         const colorSelectScreen = document.getElementById('colorSelectScreen');
         const selectedPlayerNameEl = document.getElementById('selectedPlayerName');
 
-        // Player and color selection
+        // Player, color and striker selection
         let selectedPlayer = 'courtois';
         let selectedJerseyColor = null;
+        let selectedStriker = 'haaland';
+        let selectedRole = 'goalkeeper'; // 'goalkeeper' or 'striker'
+        let opponentGoalkeeper = 'courtois'; // For striker mode
+        const strikerSelectScreen = document.getElementById('strikerSelectScreen');
+        const roleSelectScreen = document.getElementById('roleSelectScreen');
+        const goalkeeperSelectScreen = document.getElementById('goalkeeperSelectScreen');
+
+        // Striker mode variables
+        let isAiming = false;
+        let aimTarget = { x: 0, y: 0 };
+        let canKick = true;
+        let aiGoalkeeperSpeed = 4;
 
         const jerseyColors = {
             white: { main: '#ffffff', accent: '#e0e0e0', textColor: '#333333' },
@@ -940,6 +1080,111 @@
             'yermakov': 'ירמקוב'
         };
 
+        // Striker data for different opponents
+        const strikerData = {
+            haaland: {
+                name: 'HAALAND',
+                hebrewName: 'הארלנד',
+                team: 'מנצ\'סטר סיטי',
+                jerseyColor: '#6bb5e0',      // Sky blue Man City
+                jerseyAccent: '#4a9cc9',
+                shortsColor: '#ffffff',
+                socksColor: '#6bb5e0',
+                hairColor: '#f5deb3',         // Blonde
+                skinColor: '#f4c7a0',
+                eyeColor: '#4a90c9',          // Blue eyes
+                number: '9',
+                hasBun: true,
+                hasBeard: false,
+                hasCurlyHair: false
+            },
+            mbappe: {
+                name: 'MBAPPÉ',
+                hebrewName: 'מבאפה',
+                team: 'ריאל מדריד',
+                jerseyColor: '#ffffff',       // White Real Madrid
+                jerseyAccent: '#e0e0e0',
+                shortsColor: '#ffffff',
+                socksColor: '#ffffff',
+                hairColor: '#1a1a1a',         // Black hair
+                skinColor: '#8d6e4c',         // Dark skin
+                eyeColor: '#2d1810',          // Dark brown eyes
+                number: '9',
+                hasBun: false,
+                hasBeard: false,
+                hasCurlyHair: false
+            },
+            vinicius: {
+                name: 'VINICIUS JR',
+                hebrewName: 'ויניסיוס',
+                team: 'ריאל מדריד',
+                jerseyColor: '#ffffff',       // White Real Madrid
+                jerseyAccent: '#e0e0e0',
+                shortsColor: '#ffffff',
+                socksColor: '#ffffff',
+                hairColor: '#1a1a1a',         // Black curly hair
+                skinColor: '#8d6e4c',         // Dark skin
+                eyeColor: '#2d1810',          // Dark brown eyes
+                number: '7',
+                hasBun: false,
+                hasBeard: false,
+                hasCurlyHair: true
+            },
+            salah: {
+                name: 'SALAH',
+                hebrewName: 'סלאח',
+                team: 'ליברפול',
+                jerseyColor: '#c8102e',       // Red Liverpool
+                jerseyAccent: '#a00d24',
+                shortsColor: '#c8102e',
+                socksColor: '#c8102e',
+                hairColor: '#2d1810',         // Dark curly hair
+                skinColor: '#c49a6c',         // Egyptian complexion
+                eyeColor: '#2d1810',          // Dark brown eyes
+                number: '11',
+                hasBun: false,
+                hasBeard: true,
+                hasCurlyHair: true
+            },
+            shachar: {
+                name: 'SHACHAR',
+                hebrewName: 'שחר',
+                team: 'הכוכב!',
+                jerseyColor: '#fbbf24',       // Gold/Yellow - star player!
+                jerseyAccent: '#f59e0b',
+                shortsColor: '#1a1a1a',       // Black shorts
+                socksColor: '#fbbf24',        // Gold socks
+                hairColor: '#4a3728',         // Brown hair
+                skinColor: '#f4c7a0',         // Light skin
+                eyeColor: '#5c4033',          // Brown eyes
+                number: '10',                 // Number 10 - the star!
+                hasBun: false,
+                hasBeard: false,
+                hasCurlyHair: false,
+                isSpecial: true               // Special flag for extra effects
+            }
+        };
+
+        // Select role function (FIRST step)
+        function selectRole(role) {
+            selectedRole = role;
+            roleSelectScreen.style.display = 'none';
+
+            // Update player selection screen title based on role
+            const playerTitle = document.querySelector('#playerSelectScreen .quiz-content h2');
+            const playerSubtitle = document.querySelector('#playerSelectScreen .quiz-content .subtitle');
+
+            if (role === 'goalkeeper') {
+                playerTitle.textContent = 'בחר את השוער שלך:';
+                playerSubtitle.textContent = 'מי יעצור את הכדורים?';
+            } else {
+                playerTitle.textContent = 'בחר את המראה שלך:';
+                playerSubtitle.textContent = 'איך אתה רוצה להיראות?';
+            }
+
+            playerSelectScreen.style.display = 'flex';
+        }
+
         // Select player function
         function selectPlayer(player) {
             selectedPlayer = player;
@@ -953,9 +1198,32 @@
         function selectColor(color) {
             selectedJerseyColor = color;
             colorSelectScreen.style.display = 'none';
+
+            if (selectedRole === 'goalkeeper') {
+                // Goalkeeper mode - choose opponent striker
+                strikerSelectScreen.style.display = 'flex';
+            } else {
+                // Striker mode - choose opponent goalkeeper
+                goalkeeperSelectScreen.style.display = 'flex';
+            }
+        }
+
+        // Select striker function (for goalkeeper mode)
+        function selectStriker(striker) {
+            selectedStriker = striker;
+            strikerSelectScreen.style.display = 'none';
             startScreen.style.display = 'flex';
-            // Update instructions text
-            document.querySelector('.instructions').innerHTML = `גע במסך להזיז את ${hebrewNames[selectedPlayer]} ולעצור את הכדור!`;
+            // Update instructions text for goalkeeper mode
+            document.querySelector('.instructions').innerHTML = `גע במסך להזיז את ${hebrewNames[selectedPlayer]} ולעצור את הכדור של ${strikerData[selectedStriker].hebrewName}!`;
+        }
+
+        // Select opponent goalkeeper function (for striker mode)
+        function selectOpponentGoalkeeper(gk) {
+            opponentGoalkeeper = gk;
+            goalkeeperSelectScreen.style.display = 'none';
+            startScreen.style.display = 'flex';
+            // Update instructions text for striker mode
+            document.querySelector('.instructions').innerHTML = `גע על השער לבחור לאן לבעוט! נסה להבקיע ל${hebrewNames[opponentGoalkeeper]}!`;
         }
 
         // Start game with selected difficulty
@@ -967,7 +1235,21 @@
             gameRunning = true;
             showTouchHint = true;
             setTimeout(() => { showTouchHint = false; }, 5000);
-            setTimeout(shootBall, 1000);
+
+            // Update score labels based on role
+            const scoreLabel = document.getElementById('scoreLabel');
+            const missedLabel = document.getElementById('missedLabel');
+
+            if (selectedRole === 'striker') {
+                scoreLabel.textContent = 'שערים';
+                missedLabel.textContent = 'פספוסים';
+                canKick = true;
+                // In striker mode, wait for player to aim and kick
+            } else {
+                scoreLabel.textContent = 'הצלות';
+                missedLabel.textContent = 'החמצות';
+                setTimeout(shootBall, 1000);
+            }
         }
 
         // === SOUND EFFECTS ===
@@ -1191,7 +1473,7 @@
         }
         initFans();
 
-        // Reading quiz data: emoji, correct answer, and two wrong answers
+        // Reading quiz data: emoji, correct answer, and two wrong answers (for easy mode)
         const readingQuizzes = [
             { picture: '☁️', correct: 'ענן', wrong: ['ירח', 'שמש'] },
             { picture: '🌙', correct: 'ירח', wrong: ['כוכב', 'שמש'] },
@@ -1223,6 +1505,46 @@
             { picture: '🌳', correct: 'עץ', wrong: ['פרח', 'בית'] },
             { picture: '🌸', correct: 'פרח', wrong: ['עץ', 'עלה'] },
             { picture: '⚽', correct: 'כדור', wrong: ['כובע', 'נעל'] },
+        ];
+
+        // Odd one out quizzes for hard mode - find the word that doesn't belong
+        const oddOneOutQuizzes = [
+            // Animals vs objects
+            { category: 'חיות', words: ['כלב', 'חתול', 'ארנב', 'כיסא'], oddOne: 'כיסא' },
+            { category: 'חיות', words: ['אריה', 'דוב', 'פיל', 'שולחן'], oddOne: 'שולחן' },
+            { category: 'חיות', words: ['ציפור', 'דג', 'פרפר', 'מכונית'], oddOne: 'מכונית' },
+            // Sky things vs animals
+            { category: 'דברים בשמיים', words: ['שמש', 'ענן', 'ירח', 'פיל'], oddOne: 'פיל' },
+            { category: 'דברים בשמיים', words: ['כוכב', 'קשת', 'ענן', 'כלב'], oddOne: 'כלב' },
+            // Fruits vs others
+            { category: 'פירות', words: ['תפוח', 'בננה', 'תפוז', 'כדור'], oddOne: 'כדור' },
+            { category: 'פירות', words: ['ענבים', 'תות', 'תפוח', 'עכבר'], oddOne: 'עכבר' },
+            { category: 'פירות', words: ['לימון', 'אבטיח', 'תפוז', 'חתול'], oddOne: 'חתול' },
+            // Vehicles vs others
+            { category: 'כלי תחבורה', words: ['מכונית', 'אוטובוס', 'רכבת', 'תפוח'], oddOne: 'תפוח' },
+            { category: 'כלי תחבורה', words: ['מטוס', 'אונייה', 'רכבת', 'פרח'], oddOne: 'פרח' },
+            // Sweets/candy vs others
+            { category: 'ממתקים', words: ['סוכריה', 'מסטיק', 'מרשמלו', 'עכבר'], oddOne: 'עכבר' },
+            { category: 'ממתקים', words: ['שוקולד', 'סוכריה', 'גלידה', 'כיסא'], oddOne: 'כיסא' },
+            { category: 'ממתקים', words: ['עוגה', 'ביסקוויט', 'סוכריה', 'כדור'], oddOne: 'כדור' },
+            // Body parts vs others
+            { category: 'איברי גוף', words: ['יד', 'רגל', 'אף', 'עץ'], oddOne: 'עץ' },
+            { category: 'איברי גוף', words: ['עין', 'אוזן', 'פה', 'שמש'], oddOne: 'שמש' },
+            // Colors vs others
+            { category: 'צבעים', words: ['אדום', 'כחול', 'ירוק', 'כלב'], oddOne: 'כלב' },
+            { category: 'צבעים', words: ['צהוב', 'סגול', 'לבן', 'בית'], oddOne: 'בית' },
+            // Clothes vs others
+            { category: 'בגדים', words: ['חולצה', 'מכנסיים', 'נעליים', 'תפוח'], oddOne: 'תפוח' },
+            { category: 'בגדים', words: ['כובע', 'שמלה', 'גרביים', 'ירח'], oddOne: 'ירח' },
+            // School items vs others
+            { category: 'דברים בבית ספר', words: ['עיפרון', 'מחברת', 'תיק', 'כלב'], oddOne: 'כלב' },
+            { category: 'דברים בבית ספר', words: ['ספר', 'מחק', 'סרגל', 'בננה'], oddOne: 'בננה' },
+            // Food (not sweets) vs others
+            { category: 'אוכל', words: ['לחם', 'ביצה', 'גבינה', 'מכונית'], oddOne: 'מכונית' },
+            { category: 'אוכל', words: ['עוף', 'אורז', 'ירקות', 'כוכב'], oddOne: 'כוכב' },
+            // Nature vs man-made
+            { category: 'דברים בטבע', words: ['עץ', 'פרח', 'דשא', 'טלוויזיה'], oddOne: 'טלוויזיה' },
+            { category: 'דברים בטבע', words: ['הר', 'נהר', 'ים', 'שולחן'], oddOne: 'שולחן' },
         ];
 
         let ball = {
@@ -1295,32 +1617,82 @@
             return (clientY - rect.top) * scaleY;
         }
 
+        function getCanvasX(clientX) {
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            return (clientX - rect.left) * scaleX;
+        }
+
+        // Handle striker mode aiming
+        function handleStrikerAim(clientX, clientY) {
+            if (selectedRole !== 'striker' || !gameRunning || !canKick) return false;
+
+            const x = getCanvasX(clientX);
+            const y = getCanvasY(clientY);
+
+            // Check if clicking on goal area (left side of screen)
+            if (x < 200 && y > goal.y && y < goal.y + goal.height) {
+                aimTarget = { x: goal.x + goal.width / 2, y: y };
+                kickBall();
+                return true;
+            }
+            return false;
+        }
+
         // Touch events
         canvas.addEventListener('touchstart', (e) => {
             e.preventDefault();
             initAudio();
             const touch = e.touches[0];
+
+            // Check for striker mode aiming first
+            if (handleStrikerAim(touch.clientX, touch.clientY)) {
+                return;
+            }
+
             targetY = getCanvasY(touch.clientY);
         }, { passive: false });
 
         canvas.addEventListener('touchmove', (e) => {
             e.preventDefault();
+            if (selectedRole === 'striker') return; // Don't track movement in striker mode
+
             const touch = e.touches[0];
             targetY = getCanvasY(touch.clientY);
         }, { passive: false });
 
         canvas.addEventListener('touchend', () => {
-            targetY = null;
+            if (selectedRole !== 'striker') {
+                targetY = null;
+            }
         });
 
         // Mouse events (for desktop)
         let mouseDown = false;
         canvas.addEventListener('mousedown', (e) => {
+            // Check for striker mode aiming first
+            if (handleStrikerAim(e.clientX, e.clientY)) {
+                return;
+            }
+
             mouseDown = true;
             targetY = getCanvasY(e.clientY);
         });
 
         canvas.addEventListener('mousemove', (e) => {
+            if (selectedRole === 'striker') {
+                // Show aim indicator in striker mode
+                const x = getCanvasX(e.clientX);
+                const y = getCanvasY(e.clientY);
+                if (x < 200 && y > goal.y && y < goal.y + goal.height) {
+                    aimTarget = { x: goal.x + goal.width / 2, y: y };
+                    isAiming = true;
+                } else {
+                    isAiming = false;
+                }
+                return;
+            }
+
             if (mouseDown) {
                 targetY = getCanvasY(e.clientY);
             }
@@ -1334,6 +1706,7 @@
         canvas.addEventListener('mouseleave', () => {
             mouseDown = false;
             targetY = null;
+            isAiming = false;
         });
 
         // Responsive canvas
@@ -1550,11 +1923,12 @@
             }
         }
 
-        // Draw goalkeeper based on selected player
+        // Draw goalkeeper based on selected player (or opponent in striker mode)
         function drawGoalkeeper() {
             const gk = goalkeeper;
             const centerX = gk.x + gk.width / 2;
-            const player = playerData[selectedPlayer];
+            // In striker mode, use opponent goalkeeper; in goalkeeper mode, use selected player
+            const player = selectedRole === 'striker' ? playerData[opponentGoalkeeper] : playerData[selectedPlayer];
 
             // Legs (white shorts)
             ctx.fillStyle = '#ffffff';
@@ -1572,7 +1946,8 @@
             ctx.fillRect(gk.x + gk.width - 23, gk.y + gk.height + 22, 18, 8);
 
             // Get jersey colors (use selected color or player default)
-            const jersey = selectedJerseyColor ? jerseyColors[selectedJerseyColor] :
+            // In striker mode, opponent goalkeeper uses their default colors
+            const jersey = (selectedRole === 'goalkeeper' && selectedJerseyColor) ? jerseyColors[selectedJerseyColor] :
                           { main: player.jerseyColor, accent: player.jerseyAccent, textColor: '#1a1a1a' };
 
             // Body (jersey)
@@ -1718,22 +2093,47 @@
             ctx.fillText(player.name, centerX, gk.y - 60);
         }
 
-        // Draw Haaland (Manchester City striker)
-        function drawHaaland() {
+        // Draw striker based on selected striker (or user's player in striker mode)
+        function drawStriker() {
             const st = striker;
             const centerX = st.x + st.width / 2;
 
-            // Position Haaland near where the ball spawns
+            // In striker mode, use the user's selected player as striker (converted to striker data)
+            let player;
+            if (selectedRole === 'striker') {
+                // Create striker appearance from user's goalkeeper selection
+                const gkData = playerData[selectedPlayer];
+                player = {
+                    name: gkData.name,
+                    hebrewName: hebrewNames[selectedPlayer],
+                    jerseyColor: selectedJerseyColor ? jerseyColors[selectedJerseyColor].main : gkData.jerseyColor,
+                    jerseyAccent: selectedJerseyColor ? jerseyColors[selectedJerseyColor].accent : gkData.jerseyAccent,
+                    shortsColor: '#ffffff',
+                    socksColor: selectedJerseyColor ? jerseyColors[selectedJerseyColor].main : gkData.jerseyColor,
+                    hairColor: gkData.hairColor,
+                    skinColor: gkData.skinColor,
+                    eyeColor: gkData.eyeColor,
+                    number: '10',
+                    hasBun: gkData.hasBun,
+                    hasBeard: gkData.hasBeard,
+                    hasCurlyHair: false,
+                    isSpecial: true
+                };
+            } else {
+                player = strikerData[selectedStriker];
+            }
+
+            // Position striker near where the ball spawns
             st.y = ball.active ? ball.y - st.height / 2 : 200;
             st.y = Math.max(goal.y, Math.min(goal.y + goal.height - st.height, st.y));
 
-            // Legs (white shorts - Man City style)
-            ctx.fillStyle = '#ffffff';
+            // Legs (shorts color from player data)
+            ctx.fillStyle = player.shortsColor;
             ctx.fillRect(st.x + 8, st.y + st.height - 15, 12, 30);
             ctx.fillRect(st.x + st.width - 20, st.y + st.height - 15, 12, 30);
 
-            // Socks (sky blue)
-            ctx.fillStyle = '#6bb5e0';
+            // Socks
+            ctx.fillStyle = player.socksColor;
             ctx.fillRect(st.x + 8, st.y + st.height + 10, 12, 15);
             ctx.fillRect(st.x + st.width - 20, st.y + st.height + 10, 12, 15);
 
@@ -1742,58 +2142,98 @@
             ctx.fillRect(st.x + 5, st.y + st.height + 22, 18, 8);
             ctx.fillRect(st.x + st.width - 23, st.y + st.height + 22, 18, 8);
 
-            // Body (Sky blue Manchester City jersey)
-            ctx.fillStyle = '#6bb5e0';
+            // Body (jersey)
+            ctx.fillStyle = player.jerseyColor;
             ctx.fillRect(st.x, st.y, st.width, st.height - 10);
 
             // Jersey details - darker accent
-            ctx.fillStyle = '#4a9cc9';
+            ctx.fillStyle = player.jerseyAccent;
             ctx.fillRect(st.x, st.y + 25, st.width, 6);
             ctx.fillRect(st.x, st.y + 55, st.width, 6);
 
-            // Number 9 on chest
-            ctx.fillStyle = '#ffffff';
+            // Number on chest
+            const numberColor = player.jerseyColor === '#ffffff' ? '#333333' : '#ffffff';
+            ctx.fillStyle = numberColor;
             ctx.font = 'bold 26px Arial';
             ctx.textAlign = 'center';
-            ctx.fillText('9', centerX, st.y + 50);
+            ctx.fillText(player.number, centerX, st.y + 50);
 
             // Arms (same jersey color)
-            ctx.fillStyle = '#6bb5e0';
+            ctx.fillStyle = player.jerseyColor;
             ctx.fillRect(st.x - 18, st.y + 5, 20, 40);
             ctx.fillRect(st.x + st.width - 2, st.y + 5, 20, 40);
 
             // Hands
-            ctx.fillStyle = '#f4c7a0';
+            ctx.fillStyle = player.skinColor;
             ctx.beginPath();
             ctx.arc(st.x - 8, st.y + 50, 10, 0, Math.PI * 2);
             ctx.arc(st.x + st.width + 8, st.y + 50, 10, 0, Math.PI * 2);
             ctx.fill();
 
-            // Head (Haaland has a strong jaw and big build)
-            ctx.fillStyle = '#f4c7a0';
+            // Head
+            ctx.fillStyle = player.skinColor;
             ctx.beginPath();
             ctx.ellipse(centerX, st.y - 25, 24, 28, 0, 0, Math.PI * 2);
             ctx.fill();
 
-            // Hair (Haaland has blonde hair, often tied back)
-            ctx.fillStyle = '#f5deb3';
-            ctx.beginPath();
-            ctx.ellipse(centerX, st.y - 48, 22, 18, 0, Math.PI, 2 * Math.PI);
-            ctx.fill();
-            // Side hair
-            ctx.beginPath();
-            ctx.ellipse(centerX - 20, st.y - 35, 8, 18, 0.3, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.beginPath();
-            ctx.ellipse(centerX + 20, st.y - 35, 8, 18, -0.3, 0, Math.PI * 2);
-            ctx.fill();
-            // Hair bun/ponytail
-            ctx.beginPath();
-            ctx.arc(centerX, st.y - 55, 12, 0, Math.PI * 2);
-            ctx.fill();
+            // Hair
+            ctx.fillStyle = player.hairColor;
+            if (player.hasCurlyHair) {
+                // Curly hair (for Vinicius, Salah)
+                for (let i = 0; i < 12; i++) {
+                    const angle = (i / 12) * Math.PI + Math.PI;
+                    const x = centerX + Math.cos(angle) * 18;
+                    const y = st.y - 40 + Math.sin(angle) * 10;
+                    ctx.beginPath();
+                    ctx.arc(x, y, 8, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                // Extra curls on top
+                for (let i = 0; i < 5; i++) {
+                    ctx.beginPath();
+                    ctx.arc(centerX - 12 + i * 6, st.y - 50, 6, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            } else {
+                // Regular hair
+                ctx.beginPath();
+                ctx.ellipse(centerX, st.y - 48, 22, 18, 0, Math.PI, 2 * Math.PI);
+                ctx.fill();
+                // Side hair
+                ctx.beginPath();
+                ctx.ellipse(centerX - 20, st.y - 35, 8, 18, 0.3, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.beginPath();
+                ctx.ellipse(centerX + 20, st.y - 35, 8, 18, -0.3, 0, Math.PI * 2);
+                ctx.fill();
+            }
 
-            // Eyebrows (blonde, lighter)
-            ctx.fillStyle = '#d4b896';
+            // Hair bun/ponytail (for Haaland)
+            if (player.hasBun) {
+                ctx.beginPath();
+                ctx.arc(centerX, st.y - 55, 12, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            // Beard (for Salah)
+            if (player.hasBeard) {
+                ctx.fillStyle = player.hairColor;
+                // Main beard shape
+                ctx.beginPath();
+                ctx.moveTo(centerX - 18, st.y - 15);
+                ctx.quadraticCurveTo(centerX - 22, st.y, centerX - 12, st.y + 10);
+                ctx.quadraticCurveTo(centerX, st.y + 15, centerX + 12, st.y + 10);
+                ctx.quadraticCurveTo(centerX + 22, st.y, centerX + 18, st.y - 15);
+                ctx.fill();
+                // Mustache
+                ctx.beginPath();
+                ctx.ellipse(centerX, st.y - 8, 10, 4, 0, 0, Math.PI);
+                ctx.fill();
+            }
+
+            // Eyebrows
+            const eyebrowColor = player.hairColor === '#f5deb3' ? '#d4b896' : player.hairColor;
+            ctx.fillStyle = eyebrowColor;
             ctx.fillRect(centerX - 15, st.y - 38, 12, 3);
             ctx.fillRect(centerX + 3, st.y - 38, 12, 3);
 
@@ -1804,15 +2244,15 @@
             ctx.ellipse(centerX + 9, st.y - 30, 6, 5, 0, 0, Math.PI * 2);
             ctx.fill();
 
-            // Pupils (blue eyes)
-            ctx.fillStyle = '#4a90c9';
+            // Pupils
+            ctx.fillStyle = player.eyeColor;
             ctx.beginPath();
             ctx.arc(centerX - 9, st.y - 30, 3, 0, Math.PI * 2);
             ctx.arc(centerX + 9, st.y - 30, 3, 0, Math.PI * 2);
             ctx.fill();
 
             // Nose
-            ctx.strokeStyle = '#d4a574';
+            ctx.strokeStyle = player.skinColor === '#f4c7a0' ? '#d4a574' : '#a07850';
             ctx.lineWidth = 2;
             ctx.beginPath();
             ctx.moveTo(centerX, st.y - 28);
@@ -1828,17 +2268,35 @@
             ctx.stroke();
 
             // Ears
-            ctx.fillStyle = '#f4c7a0';
+            ctx.fillStyle = player.skinColor;
             ctx.beginPath();
             ctx.ellipse(centerX - 24, st.y - 28, 5, 8, 0, 0, Math.PI * 2);
             ctx.ellipse(centerX + 24, st.y - 28, 5, 8, 0, 0, Math.PI * 2);
             ctx.fill();
 
-            // Name above (Haaland)
+            // Name above
             ctx.fillStyle = '#1a1a1a';
             ctx.font = 'bold 12px Arial';
             ctx.textAlign = 'center';
-            ctx.fillText('HAALAND', centerX, st.y - 72);
+            ctx.fillText(player.name, centerX, st.y - 72);
+
+            // Special star effect for Shachar
+            if (player.isSpecial) {
+                // Glowing star above head
+                const starY = st.y - 85;
+                const pulse = Math.sin(Date.now() / 200) * 3;
+
+                // Star glow
+                ctx.fillStyle = 'rgba(251, 191, 36, 0.3)';
+                ctx.beginPath();
+                ctx.arc(centerX, starY, 15 + pulse, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Draw star
+                ctx.fillStyle = '#fbbf24';
+                ctx.font = '20px Arial';
+                ctx.fillText('⭐', centerX, starY + 7);
+            }
         }
 
         // Draw the soccer ball
@@ -1883,8 +2341,14 @@
             ctx.stroke();
         }
 
-        // Move goalkeeper based on keys or touch
+        // Move goalkeeper based on keys or touch (for goalkeeper mode)
         function moveGoalkeeper() {
+            if (selectedRole === 'striker') {
+                // AI controls the goalkeeper in striker mode
+                moveAIGoalkeeper();
+                return;
+            }
+
             // Keyboard controls
             if (keys.up && goalkeeper.y > goal.y + 10) {
                 goalkeeper.y -= goalkeeper.speed;
@@ -1904,6 +2368,56 @@
                     } else if (diff > 0 && goalkeeper.y + goalkeeper.height < goal.y + goal.height - 10) {
                         goalkeeper.y += Math.min(goalkeeper.speed, Math.abs(diff));
                     }
+                }
+            }
+        }
+
+        // AI Goalkeeper movement (for striker mode)
+        let aiReactionStarted = false;
+        let aiGuessDirection = 0; // -1 = up, 1 = down, 0 = none
+
+        function moveAIGoalkeeper() {
+            if (!ball.active) {
+                // When no ball, move randomly or stay center
+                const centerY = goal.y + goal.height / 2 - goalkeeper.height / 2;
+                const diff = centerY - goalkeeper.y;
+                if (Math.abs(diff) > 5) {
+                    goalkeeper.y += Math.sign(diff) * Math.min(2, Math.abs(diff));
+                }
+                aiReactionStarted = false;
+                aiGuessDirection = 0;
+                return;
+            }
+
+            // AI only starts reacting when ball is close enough (past halfway)
+            if (ball.x > 350) {
+                // Ball still far - don't react yet, maybe move randomly
+                if (Math.random() > 0.95) {
+                    goalkeeper.y += (Math.random() - 0.5) * 4;
+                }
+                return;
+            }
+
+            // Ball is getting close - AI makes a GUESS where to go
+            if (!aiReactionStarted && ball.x < 350) {
+                aiReactionStarted = true;
+                // AI guesses where the ball is going (sometimes wrong!)
+                const correctGuess = Math.random() > 0.4; // 60% chance to guess correctly
+                if (correctGuess) {
+                    aiGuessDirection = ball.y < goalkeeper.y + goalkeeper.height / 2 ? -1 : 1;
+                } else {
+                    // Wrong guess - go opposite direction!
+                    aiGuessDirection = ball.y < goalkeeper.y + goalkeeper.height / 2 ? 1 : -1;
+                }
+            }
+
+            // Move based on the guess (not tracking the ball perfectly)
+            const speedMultiplier = mathDifficulty === 'hard' ? 3.5 : 2.5;
+
+            if (aiGuessDirection !== 0) {
+                const newY = goalkeeper.y + (aiGuessDirection * speedMultiplier);
+                if (newY > goal.y + 10 && newY + goalkeeper.height < goal.y + goal.height - 10) {
+                    goalkeeper.y = newY;
                 }
             }
         }
@@ -1969,7 +2483,11 @@
                     setTimeout(() => {
                         bonusMessage.style.display = 'none';
                     }, 1500);
-                    setTimeout(shootBall, 1000);
+                    if (selectedRole === 'striker') {
+                        canKick = true; // Enable kicking in striker mode
+                    } else {
+                        setTimeout(shootBall, 1000);
+                    }
                 }, 1500);
             } else {
                 mathResult.textContent = `לא נכון... התשובה היא ${mathAnswer}`;
@@ -1978,7 +2496,11 @@
                 setTimeout(() => {
                     mathQuiz.style.display = 'none';
                     gameRunning = true;
-                    setTimeout(shootBall, 1000);
+                    if (selectedRole === 'striker') {
+                        canKick = true;
+                    } else {
+                        setTimeout(shootBall, 1000);
+                    }
                 }, 2000);
             }
         }
@@ -1987,24 +2509,57 @@
         function showReadingQuiz() {
             gameRunning = false;
 
-            // Pick a random quiz
-            const quiz = readingQuizzes[Math.floor(Math.random() * readingQuizzes.length)];
-            readingPicture.textContent = quiz.picture;
+            if (mathDifficulty === 'hard') {
+                // Hard mode: Odd one out quiz
+                isOddOneOutQuiz = true;
+                const quiz = oddOneOutQuizzes[Math.floor(Math.random() * oddOneOutQuizzes.length)];
 
-            // Create shuffled options
-            const options = [quiz.correct, ...quiz.wrong];
-            shuffleArray(options);
-            currentReadingAnswer = options.indexOf(quiz.correct);
+                // Update the quiz title for odd one out
+                document.querySelector('#readingQuiz .quiz-content h2').textContent = 'בחר את המילה יוצאת הדופן!';
+                document.querySelector('#readingQuiz .subtitle').textContent = 'איזו מילה לא שייכת לקבוצה? בחר נכון וקבל 5 נקודות בונוס!';
+                readingPicture.textContent = '🤔';
 
-            // Update buttons
-            readingOptions.innerHTML = '';
-            options.forEach((option, index) => {
-                const btn = document.createElement('button');
-                btn.className = 'reading-option';
-                btn.textContent = option;
-                btn.onclick = () => checkReadingAnswer(index);
-                readingOptions.appendChild(btn);
-            });
+                // Shuffle the words
+                const options = [...quiz.words];
+                shuffleArray(options);
+                currentOddOneOutAnswer = options.indexOf(quiz.oddOne);
+
+                // Update buttons with 4 options
+                readingOptions.innerHTML = '';
+                options.forEach((option, index) => {
+                    const btn = document.createElement('button');
+                    btn.className = 'reading-option';
+                    btn.textContent = option;
+                    btn.onclick = () => checkReadingAnswer(index);
+                    readingOptions.appendChild(btn);
+                });
+            } else {
+                // Easy mode: Picture quiz
+                isOddOneOutQuiz = false;
+
+                // Reset the quiz title for picture quiz
+                document.querySelector('#readingQuiz .quiz-content h2').textContent = 'מה רואים בתמונה?';
+                document.querySelector('#readingQuiz .subtitle').textContent = 'בחר את המילה הנכונה וקבל 5 נקודות בונוס!';
+
+                // Pick a random quiz
+                const quiz = readingQuizzes[Math.floor(Math.random() * readingQuizzes.length)];
+                readingPicture.textContent = quiz.picture;
+
+                // Create shuffled options
+                const options = [quiz.correct, ...quiz.wrong];
+                shuffleArray(options);
+                currentReadingAnswer = options.indexOf(quiz.correct);
+
+                // Update buttons
+                readingOptions.innerHTML = '';
+                options.forEach((option, index) => {
+                    const btn = document.createElement('button');
+                    btn.className = 'reading-option';
+                    btn.textContent = option;
+                    btn.onclick = () => checkReadingAnswer(index);
+                    readingOptions.appendChild(btn);
+                });
+            }
 
             readingResult.textContent = '';
             readingResult.className = 'quiz-result';
@@ -2014,8 +2569,9 @@
         // Check reading answer
         function checkReadingAnswer(index) {
             const buttons = readingOptions.querySelectorAll('.reading-option');
+            const correctAnswer = isOddOneOutQuiz ? currentOddOneOutAnswer : currentReadingAnswer;
 
-            if (index === currentReadingAnswer) {
+            if (index === correctAnswer) {
                 buttons[index].classList.add('selected');
                 readingResult.textContent = 'נכון! +5 נקודות!';
                 readingResult.className = 'quiz-result correct';
@@ -2030,18 +2586,26 @@
                     setTimeout(() => {
                         bonusMessage.style.display = 'none';
                     }, 1500);
-                    setTimeout(shootBall, 1000);
+                    if (selectedRole === 'striker') {
+                        canKick = true;
+                    } else {
+                        setTimeout(shootBall, 1000);
+                    }
                 }, 1500);
             } else {
                 buttons[index].classList.add('wrong-selected');
-                buttons[currentReadingAnswer].classList.add('selected');
+                buttons[correctAnswer].classList.add('selected');
                 readingResult.textContent = 'לא נכון...';
                 readingResult.className = 'quiz-result wrong';
 
                 setTimeout(() => {
                     readingQuiz.style.display = 'none';
                     gameRunning = true;
-                    setTimeout(shootBall, 1000);
+                    if (selectedRole === 'striker') {
+                        canKick = true;
+                    } else {
+                        setTimeout(shootBall, 1000);
+                    }
                 }, 2000);
             }
         }
@@ -2054,7 +2618,48 @@
             }
         }
 
-        // Shoot ball from right side
+        // Kick ball (striker mode - player kicks)
+        function kickBall() {
+            if (!gameRunning || !canKick) return;
+
+            // Check if it's time for a quiz (every 10 balls, only once per round)
+            if (totalBalls > 0 && totalBalls % 10 === 0 && !quizShownForRound) {
+                quizShownForRound = true;
+                if (Math.random() > 0.5) {
+                    showMathQuiz();
+                } else {
+                    showReadingQuiz();
+                }
+                return;
+            }
+
+            if (totalBalls % 10 !== 0) {
+                quizShownForRound = false;
+            }
+
+            canKick = false;
+            ball.active = true;
+
+            // Ball starts from striker position (right side)
+            ball.x = striker.x - 30;
+            ball.y = striker.y + striker.height / 2;
+
+            // Calculate velocity towards aim target
+            const dx = aimTarget.x - ball.x;
+            const dy = aimTarget.y - ball.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            const speed = 10 + Math.random() * 3;
+
+            ball.velocityX = (dx / distance) * speed;
+            ball.velocityY = (dy / distance) * speed;
+
+            // Add slight randomness to make it more realistic
+            ball.velocityY += (Math.random() - 0.5) * 2;
+
+            playKickSound();
+        }
+
+        // Shoot ball from right side (goalkeeper mode - AI kicks)
         function shootBall() {
             if (!gameRunning) return;
 
@@ -2101,6 +2706,17 @@
                 ball.y = Math.max(ball.radius, Math.min(canvas.height - ball.radius, ball.y));
             }
 
+            if (selectedRole === 'striker') {
+                // STRIKER MODE - player trying to score
+                updateBallStrikerMode();
+            } else {
+                // GOALKEEPER MODE - player trying to save
+                updateBallGoalkeeperMode();
+            }
+        }
+
+        // Ball update for goalkeeper mode
+        function updateBallGoalkeeperMode() {
             // Check if goalkeeper saves
             if (ball.x - ball.radius < goalkeeper.x + goalkeeper.width + 15 &&
                 ball.x > goalkeeper.x &&
@@ -2153,17 +2769,96 @@
             }
         }
 
+        // Ball update for striker mode
+        function updateBallStrikerMode() {
+            // Check if goalkeeper saves
+            if (ball.x - ball.radius < goalkeeper.x + goalkeeper.width + 15 &&
+                ball.x > goalkeeper.x - 10 &&
+                ball.y > goalkeeper.y - 30 &&
+                ball.y < goalkeeper.y + goalkeeper.height + 30) {
+                // SAVED by goalkeeper!
+                missed++; // In striker mode, "missed" = shots saved
+                totalBalls++;
+                missedElement.textContent = missed;
+                showMessage('miss'); // Shows disappointment
+                ball.active = false;
+
+                if (totalBalls >= maxBalls) {
+                    setTimeout(endGame, 1500);
+                } else {
+                    canKick = true; // Allow next kick
+                }
+                return;
+            }
+
+            // Check if ball went into goal (GOAL!)
+            if (ball.x < goal.x + goal.width) {
+                if (ball.y > goal.y && ball.y < goal.y + goal.height) {
+                    // GOAL!
+                    saves++; // In striker mode, "saves" = goals scored
+                    totalBalls++;
+                    savesElement.textContent = saves;
+                    showMessage('save'); // Shows celebration (reusing save message/effects)
+                    ball.active = false;
+
+                    if (totalBalls >= maxBalls) {
+                        setTimeout(endGame, 1500);
+                    } else {
+                        canKick = true; // Allow next kick
+                    }
+                    return;
+                }
+            }
+
+            // Ball went off screen (hit post or missed)
+            if (ball.x < -50 || ball.x > canvas.width + 50 || ball.y < -50 || ball.y > canvas.height + 50) {
+                missed++;
+                totalBalls++;
+                missedElement.textContent = missed;
+                ball.active = false;
+                remainingElement.textContent = maxBalls - totalBalls;
+
+                if (totalBalls >= maxBalls) {
+                    setTimeout(endGame, 1000);
+                } else {
+                    canKick = true;
+                }
+            }
+        }
+
         function showMessage(type) {
-            if (type === 'save') {
-                saveMessage.style.display = 'block';
-                setTimeout(() => { saveMessage.style.display = 'none'; }, 1000);
-                playSaveSound(); // Sound effect
-                fansCheer(); // Fans celebrate the save!
+            if (selectedRole === 'striker') {
+                // In striker mode, swap the messages
+                if (type === 'save') {
+                    // "Save" in striker mode = GOAL!
+                    saveMessage.textContent = 'גול!';
+                    saveMessage.style.display = 'block';
+                    setTimeout(() => { saveMessage.style.display = 'none'; }, 1000);
+                    playSaveSound();
+                    fansCheer();
+                } else {
+                    // "Miss" in striker mode = saved by keeper
+                    missMessage.textContent = 'נעצר!';
+                    missMessage.style.display = 'block';
+                    setTimeout(() => { missMessage.style.display = 'none'; }, 1000);
+                    playGoalSound();
+                    fansBoo();
+                }
             } else {
-                missMessage.style.display = 'block';
-                setTimeout(() => { missMessage.style.display = 'none'; }, 1000);
-                playGoalSound(); // Sound effect
-                fansBoo(); // Fans are disappointed
+                // Goalkeeper mode - original behavior
+                saveMessage.textContent = 'הצלה!';
+                missMessage.textContent = 'גול...';
+                if (type === 'save') {
+                    saveMessage.style.display = 'block';
+                    setTimeout(() => { saveMessage.style.display = 'none'; }, 1000);
+                    playSaveSound();
+                    fansCheer();
+                } else {
+                    missMessage.style.display = 'block';
+                    setTimeout(() => { missMessage.style.display = 'none'; }, 1000);
+                    playGoalSound();
+                    fansBoo();
+                }
             }
             // Update remaining balls
             remainingElement.textContent = maxBalls - totalBalls;
@@ -2175,16 +2870,32 @@
             const totalScore = saves + bonusPoints;
             const percentage = Math.round((saves / maxBalls) * 100);
             let message = '';
-            if (percentage >= 80) {
-                message = 'מדהים! אתה שוער אלוף!';
-            } else if (percentage >= 60) {
-                message = 'כל הכבוד! שיחקת מעולה!';
-            } else if (percentage >= 40) {
-                message = 'לא רע! תמשיך להתאמן!';
+
+            if (selectedRole === 'striker') {
+                // Striker mode messages
+                if (percentage >= 80) {
+                    message = 'מדהים! אתה חלוץ אלוף!';
+                } else if (percentage >= 60) {
+                    message = 'כל הכבוד! הבקעת הרבה שערים!';
+                } else if (percentage >= 40) {
+                    message = 'לא רע! תמשיך להתאמן!';
+                } else {
+                    message = 'נסה שוב! אתה יכול להבקיע יותר!';
+                }
+                finalScoreElement.innerHTML = `${message}<br><br>הבקעת ${saves} שערים מתוך ${maxBalls} בעיטות!<br>נקודות בונוס: ${bonusPoints}<br>סה"כ: ${totalScore} נקודות!`;
             } else {
-                message = 'נסה שוב! אתה יכול יותר!';
+                // Goalkeeper mode messages
+                if (percentage >= 80) {
+                    message = 'מדהים! אתה שוער אלוף!';
+                } else if (percentage >= 60) {
+                    message = 'כל הכבוד! שיחקת מעולה!';
+                } else if (percentage >= 40) {
+                    message = 'לא רע! תמשיך להתאמן!';
+                } else {
+                    message = 'נסה שוב! אתה יכול יותר!';
+                }
+                finalScoreElement.innerHTML = `${message}<br><br>עצרת ${saves} מתוך ${maxBalls} כדורים!<br>נקודות בונוס: ${bonusPoints}<br>סה"כ: ${totalScore} נקודות!`;
             }
-            finalScoreElement.innerHTML = `${message}<br><br>עצרת ${saves} מתוך ${maxBalls} כדורים!<br>נקודות בונוס: ${bonusPoints}<br>סה"כ: ${totalScore} נקודות!`;
             gameOverScreen.style.display = 'flex';
         }
 
@@ -2196,15 +2907,26 @@
             totalBalls = 0;
             quizShownForRound = false;
             selectedJerseyColor = null;
+            selectedStriker = 'haaland';
+            selectedRole = 'goalkeeper';
+            opponentGoalkeeper = 'courtois';
+            canKick = true;
+            isAiming = false;
             savesElement.textContent = saves;
             missedElement.textContent = missed;
             bonusElement.textContent = bonusPoints;
             remainingElement.textContent = maxBalls;
+            // Reset score labels
+            document.getElementById('scoreLabel').textContent = 'הצלות';
+            document.getElementById('missedLabel').textContent = 'החמצות';
             gameOverScreen.style.display = 'none';
             mathQuiz.style.display = 'none';
             readingQuiz.style.display = 'none';
             startScreen.style.display = 'none';
             colorSelectScreen.style.display = 'none';
+            strikerSelectScreen.style.display = 'none';
+            playerSelectScreen.style.display = 'none';
+            goalkeeperSelectScreen.style.display = 'none';
             gameRunning = false;
             ball.active = false;
             goalkeeper.y = 200;
@@ -2213,8 +2935,40 @@
                 fan.armUp = false;
                 fan.bounce = 0;
             });
-            // Show player selection again
-            playerSelectScreen.style.display = 'flex';
+            // Show role selection again (first screen)
+            roleSelectScreen.style.display = 'flex';
+        }
+
+        // Draw aim indicator for striker mode
+        function drawAimIndicator() {
+            if (selectedRole !== 'striker' || !gameRunning || !canKick) return;
+
+            // Draw target zone on goal
+            ctx.fillStyle = 'rgba(255, 255, 0, 0.2)';
+            ctx.fillRect(goal.x, goal.y, goal.width + 150, goal.height);
+
+            // Draw "tap here" hint
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+            ctx.font = 'bold 16px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('👆 לחץ כאן לבעוט!', goal.x + 80, goal.y + goal.height / 2);
+
+            // Draw aim crosshair if aiming
+            if (isAiming && aimTarget.y > 0) {
+                ctx.strokeStyle = '#ff0000';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.arc(goal.x + goal.width / 2, aimTarget.y, 20, 0, Math.PI * 2);
+                ctx.stroke();
+
+                // Crosshair lines
+                ctx.beginPath();
+                ctx.moveTo(goal.x + goal.width / 2 - 30, aimTarget.y);
+                ctx.lineTo(goal.x + goal.width / 2 + 30, aimTarget.y);
+                ctx.moveTo(goal.x + goal.width / 2, aimTarget.y - 30);
+                ctx.lineTo(goal.x + goal.width / 2, aimTarget.y + 30);
+                ctx.stroke();
+            }
         }
 
         // Draw touch hint (hand icon) - shown briefly
@@ -2223,6 +2977,7 @@
 
         function drawTouchHint() {
             if (!showTouchHint || !gameRunning) return;
+            if (selectedRole === 'striker') return; // Striker mode has its own hint
 
             ctx.fillStyle = 'rgba(255,255,255,0.9)';
             ctx.fillRect(10, canvas.height - 70, 100, 55);
@@ -2246,7 +3001,8 @@
             ctx.fillStyle = '#fff';
             ctx.font = 'bold 14px Arial';
             ctx.textAlign = 'center';
-            ctx.fillText(`כדור: ${totalBalls + 1} / ${maxBalls}`, canvas.width - 60, 75);
+            const label = selectedRole === 'striker' ? 'בעיטה' : 'כדור';
+            ctx.fillText(`${label}: ${totalBalls + 1} / ${maxBalls}`, canvas.width - 60, 75);
 
             // Show next quiz indicator
             const ballsToQuiz = 10 - (totalBalls % 10);
@@ -2264,9 +3020,10 @@
             drawFans();      // Draw fans first (in the stands)
             drawField();
             drawGoal();
+            drawAimIndicator(); // Draw aim indicator for striker mode
             moveGoalkeeper();
             drawGoalkeeper();
-            drawHaaland();
+            drawStriker();
             updateBall();
             drawBall();
             drawTouchHint();
